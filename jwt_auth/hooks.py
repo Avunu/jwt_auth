@@ -196,7 +196,7 @@ app_license = "mit"
 
 # Request Events
 # ----------------
-# before_request = ["jwt_auth.utils.before_request"]
+before_request = ["jwt_auth.utils.before_request"]
 # after_request = ["jwt_auth.utils.after_request"]
 
 # Job Events

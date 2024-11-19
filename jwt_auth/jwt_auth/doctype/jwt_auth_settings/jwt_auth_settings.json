@@ -1,0 +1,72 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-11-18 11:36:53.779562",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "parameters_section",
+  "enable_jwt_user_auth",
+  "allow_new_user_registration",
+  "jwt_header",
+  "jwks_url",
+  "jwt_private_secret"
+ ],
+ "fields": [
+  {
+   "fieldname": "parameters_section",
+   "fieldtype": "Section Break",
+   "label": "Parameters"
+  },
+  {
+   "fieldname": "jwt_header",
+   "fieldtype": "Data",
+   "label": "JWT Cookie/Header"
+  },
+  {
+   "fieldname": "jwks_url",
+   "fieldtype": "Data",
+   "label": "JWKS URL"
+  },
+  {
+   "fieldname": "jwt_private_secret",
+   "fieldtype": "Password",
+   "label": "JWT Private Secret"
+  },
+  {
+   "default": "1",
+   "fieldname": "allow_new_user_registration",
+   "fieldtype": "Check",
+   "label": "Allow New User Registration"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_jwt_user_auth",
+   "fieldtype": "Check",
+   "label": "Enable JWT User Auth"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2024-11-18 15:59:09.116217",
+ "modified_by": "Administrator",
+ "module": "JWT Auth",
+ "name": "JWT Auth Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}
