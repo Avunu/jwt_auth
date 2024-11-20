@@ -6,7 +6,3 @@
 
 // 	},
 // });
-
-frappe.realtime.on("debug", (data) => {
-    console.log(data);
-});

@@ -1,9 +1,11 @@
 # Copyright (c) 2024, Avunu LLC and contributors
 # For license information, please see license.txt
 
-# import frappe
+import frappe
 from frappe.model.document import Document
 
 
 class JWTAuthSettings(Document):
-	pass
+	def validate(self):
+		if self.enable_jwt_user_auth and not self.jwt_header:
+			frappe.throw("Please set the JWT Header")
