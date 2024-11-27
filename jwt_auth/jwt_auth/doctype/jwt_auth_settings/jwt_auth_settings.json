@@ -10,7 +10,9 @@
   "allow_new_user_registration",
   "jwt_header",
   "jwks_url",
-  "jwt_private_secret"
+  "jwt_private_secret",
+  "login_url",
+  "redirect_param"
  ],
  "fields": [
   {
@@ -44,12 +46,22 @@
    "fieldname": "enable_jwt_user_auth",
    "fieldtype": "Check",
    "label": "Enable JWT User Auth"
+  },
+  {
+   "fieldname": "login_url",
+   "fieldtype": "Data",
+   "label": "Login URL"
+  },
+  {
+   "fieldname": "redirect_param",
+   "fieldtype": "Data",
+   "label": "Redirect Param"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2024-11-18 15:59:09.116217",
+ "modified": "2024-11-27 12:51:13.382088",
  "modified_by": "Administrator",
  "module": "JWT Auth",
  "name": "JWT Auth Settings",
