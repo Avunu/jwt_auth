@@ -6,6 +6,4 @@ from frappe.model.document import Document
 
 
 class JWTAuthSettings(Document):
-	def validate(self):
-		if self.enable_jwt_user_auth and not self.jwt_header:
-			frappe.throw("Please set the JWT Header")
+	pass

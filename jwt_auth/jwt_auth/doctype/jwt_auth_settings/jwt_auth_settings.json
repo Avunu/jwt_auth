@@ -6,62 +6,85 @@
  "engine": "InnoDB",
  "field_order": [
   "parameters_section",
-  "enable_jwt_user_auth",
-  "allow_new_user_registration",
+  "enabled",
+  "enable_user_reg",
   "jwt_header",
   "jwks_url",
   "jwt_private_secret",
+  "enable_login",
   "login_url",
+  "logout_url",
   "redirect_param"
  ],
  "fields": [
   {
    "fieldname": "parameters_section",
-   "fieldtype": "Section Break",
-   "label": "Parameters"
+   "fieldtype": "Section Break"
   },
   {
    "fieldname": "jwt_header",
    "fieldtype": "Data",
-   "label": "JWT Cookie/Header"
+   "label": "JWT Cookie/Header",
+   "mandatory_depends_on": "enabled",
+   "width": "800px"
   },
   {
    "fieldname": "jwks_url",
    "fieldtype": "Data",
-   "label": "JWKS URL"
+   "label": "JWKS URL",
+   "mandatory_depends_on": "enabled",
+   "width": "100%"
   },
   {
    "fieldname": "jwt_private_secret",
    "fieldtype": "Password",
-   "label": "JWT Private Secret"
-  },
-  {
-   "default": "1",
-   "fieldname": "allow_new_user_registration",
-   "fieldtype": "Check",
-   "label": "Allow New User Registration"
-  },
-  {
-   "default": "1",
-   "fieldname": "enable_jwt_user_auth",
-   "fieldtype": "Check",
-   "label": "Enable JWT User Auth"
+   "label": "JWT Private Secret",
+   "mandatory_depends_on": "enabled",
+   "width": "100%"
   },
   {
    "fieldname": "login_url",
    "fieldtype": "Data",
-   "label": "Login URL"
+   "label": "Login URL",
+   "mandatory_depends_on": "enable_login",
+   "width": "100%"
   },
   {
    "fieldname": "redirect_param",
    "fieldtype": "Data",
-   "label": "Redirect Param"
+   "label": "Redirect Param",
+   "mandatory_depends_on": "enable_login",
+   "width": "100%"
+  },
+  {
+   "default": "1",
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Enable JWT User Auth"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_user_reg",
+   "fieldtype": "Check",
+   "label": "Enable New User Registration"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_login",
+   "fieldtype": "Check",
+   "label": "Override Frappe Login"
+  },
+  {
+   "fieldname": "logout_url",
+   "fieldtype": "Data",
+   "label": "Logout URL",
+   "width": "100%"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2024-11-27 12:51:13.382088",
+ "modified": "2024-11-29 20:28:17.623754",
  "modified_by": "Administrator",
  "module": "JWT Auth",
  "name": "JWT Auth Settings",
