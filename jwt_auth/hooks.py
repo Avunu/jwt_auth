@@ -4,5 +4,5 @@ app_publisher = "Avunu LLC"
 app_description = "JWT Auth"
 app_email = "kevin@avu.nu"
 app_license = "mit"
-before_request = ["jwt_auth.auth.before_request"]
+auth_hooks = ["jwt_auth.auth.validate_auth"]
 page_renderer = ["jwt_auth.auth.SessionJWTAuth"]
