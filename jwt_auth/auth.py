@@ -17,14 +17,14 @@ from frappe.website.path_resolver import PathResolver
 
 class SessionJWTAuth:
 	def __init__(self, path=None, http_status_code=None):
-		if not hasattr(frappe.local.session, "jwt_auth"):
-			frappe.local.session.jwt_auth = JWTAuth(path, http_status_code)
+		if not hasattr(frappe.local, "jwt_auth"):
+			frappe.local.jwt_auth = JWTAuth(path, http_status_code)
 		elif path or http_status_code:
-			frappe.local.session.jwt_auth.update(path, http_status_code)
+			frappe.local.jwt_auth.update(path, http_status_code)
 
 	def __getattr__(self, name):
 		# Delegate all attribute access to the cached JWTAuth instance
-		return getattr(frappe.local.session.jwt_auth, name)
+		return getattr(frappe.local.jwt_auth, name)
 
 
 class JWTAuth:
