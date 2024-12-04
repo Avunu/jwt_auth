@@ -183,7 +183,9 @@ class JWTAuth:
 				return self.redirect(self.get_login_url(self.path))
 				
 			return self.get_renderer().render()
-		except frappe.PermissionError:
+		except frappe.PermissionError as e:
+			# Add a frappe log function to the catch block in the render function in auth.py
+			frappe.log_error("Permission Error", f"{e}\n{frappe.get_traceback()}")
 			return self.redirect(self.get_login_url(self.path))
 
 	def register_user(self, user_email):
