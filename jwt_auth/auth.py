@@ -167,13 +167,10 @@ class JWTAuth:
 			return self.redirect(self.redirect_url)
 		
 		# First check if this is a login/logout request
-		if self.settings.enable_login and self.path in ["login", "logout"]:
-			if self.path == "login":
-				params = frappe.local.request.args
-				return self.redirect(self.get_login_url(params.get("redirect-to", None)))
-			if self.path == "logout":
-				return self.redirect(self.get_logout_url())
-			
+		if self.settings.enable_login and self.path == "login":
+			params = frappe.local.request.args
+			return self.redirect(self.get_login_url(params.get("redirect-to", None)))
+
 		# Then handle normal page rendering
 		try:
 			if not self.settings.enable_login:
@@ -183,9 +180,7 @@ class JWTAuth:
 				return self.redirect(self.get_login_url(self.path))
 				
 			return self.get_renderer().render()
-		except frappe.PermissionError as e:
-			# Add a frappe log function to the catch block in the render function in auth.py
-			frappe.log_error("Permission Error", f"{e}\n{frappe.get_traceback()}")
+		except frappe.PermissionError:
 			return self.redirect(self.get_login_url(self.path))
 
 	def register_user(self, user_email):
@@ -229,6 +224,15 @@ class JWTAuth:
 
 		frappe.local.login_manager.login_as(user_email)
 
+
+@frappe.whitelist()
+def jwt_logout():
+	auth = SessionJWTAuth()
+	frappe.local.login_manager.logout()
+	if auth.settings.enabled:
+		return {"redirect_url": auth.get_logout_url()}
+	else:
+		return {"redirect_url": "/login"}
 
 def validate_auth():
 	SessionJWTAuth().validate_auth()
