@@ -52,6 +52,8 @@ class JWTAuth:
 			self.auth()
 
 	def can_auth(self):
+		if self.redirect_url:
+			return False
 		if frappe.local.session.user and frappe.local.session.user != "Guest":
 			return False
 		if not self.settings.enabled:
@@ -155,7 +157,7 @@ class JWTAuth:
 				pass
 		return valid_token
 
-	def redirect(self, path):
+	def render_redirect(self, path):
 		response = Response()
 		response.headers["Location"] = path
 		response.status_code = 302
@@ -164,12 +166,12 @@ class JWTAuth:
 
 	def render(self):
 		if self.redirect_url:
-			return self.redirect(self.redirect_url)
+			return self.render_redirect(self.redirect_url)
 		
 		# First check if this is a login/logout request
 		if self.settings.enable_login and self.path == "login":
 			params = frappe.local.request.args
-			return self.redirect(self.get_login_url(params.get("redirect-to", None)))
+			return self.render_redirect(self.get_login_url(params.get("redirect-to", None)))
 
 		# Then handle normal page rendering
 		try:
@@ -177,11 +179,11 @@ class JWTAuth:
 				return self.get_renderer().render()
 				
 			if frappe.session.user == "Guest":
-				return self.redirect(self.get_login_url(self.path))
+				return self.render_redirect(self.get_login_url(self.path))
 				
 			return self.get_renderer().render()
 		except frappe.PermissionError:
-			return self.redirect(self.get_login_url(self.path))
+			return self.render_redirect(self.get_login_url(self.path))
 
 	def register_user(self, user_email):
 		"""
@@ -207,7 +209,7 @@ class JWTAuth:
 				}
 			).insert(ignore_permissions=True)
 			contact.user = user_email
-			contact.save()
+			contact.save(ignore_permissions=True)
 		else:
 			# make a new user, required fields being email and first name. Use a placeholder for first name.
 			frappe.get_doc(
@@ -233,6 +235,22 @@ def jwt_logout():
 		return {"redirect_url": auth.get_logout_url()}
 	else:
 		return {"redirect_url": "/login"}
+
+@frappe.whitelist()
+def on_logout():
+	auth = SessionJWTAuth()
+	auth.redirect_url = auth.get_logout_url()
+ 
+@frappe.whitelist()
+def web_logout():
+	auth = SessionJWTAuth()
+	frappe.local.login_manager.logout()
+	if auth.settings.enabled:
+		location = auth.get_logout_url()
+	else:
+		location = "/login"
+	frappe.local.response["type"] = "redirect"
+	frappe.local.response["location"] = location
 
 def validate_auth():
 	SessionJWTAuth().validate_auth()
