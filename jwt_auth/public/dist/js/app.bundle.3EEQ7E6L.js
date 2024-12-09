@@ -14,7 +14,6 @@
               if (r.exc) {
                 return;
               }
-              console.log(r.message);
               if (r.message.redirect_url) {
                 window.location.href = r.message.redirect_url;
               } else {
@@ -30,4 +29,4 @@
     onFrappeApplication();
   });
 })();
-//# sourceMappingURL=app.bundle.XAA7QP3U.js.map
+//# sourceMappingURL=app.bundle.3EEQ7E6L.js.map
