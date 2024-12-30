@@ -165,11 +165,13 @@ class JWTAuth:
 		return response
 
 	def render(self):
+		# debug
+		frappe.log_error("Login request", self.path)
 		if self.redirect_url:
 			return self.render_redirect(self.redirect_url)
 		
-		# First check if this is a login/logout request
-		if self.settings.enable_login and self.path == "login":
+		# First check if this is a login request
+		if self.settings.enable_login and self.path.startswith("login"):
 			params = frappe.local.request.args
 			return self.render_redirect(self.get_login_url(params.get("redirect-to", None)))
 
