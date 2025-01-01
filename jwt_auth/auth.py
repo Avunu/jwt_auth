@@ -20,6 +20,7 @@ class SessionJWTAuth:
         if not hasattr(frappe.local, "jwt_auth"):
             frappe.local.jwt_auth = JWTAuth(path, http_status_code)
         elif path or http_status_code:
+            frappe.log_error("JWT Auth Debug", f"Updating path to {path}")
             frappe.local.jwt_auth.update(path, http_status_code)
 
     def __getattr__(self, name):
@@ -35,9 +36,7 @@ class JWTAuth:
         self.claims = None
         self.user_email = None
         self.token = None
-        self.redirect_to = (
-            None  # Initialize as None, we'll fetch from cache when needed
-        )
+        self.redirect_to = None
 
     def auth(self):
         self.user_email = self.claims.get("email") if self.claims.get("email") else None
@@ -70,7 +69,7 @@ class JWTAuth:
                 # Store redirect in session for after_request handling
                 if self.redirect_to:
                     frappe.session.data["jwt_auth_redirect"] = self.redirect_to
-                    frappe.session.data["jwt_original_location"] = self.path
+                    frappe.session.data["profile_redirect"] = True
 
     def validate_auth(self):
         if self.can_auth():
@@ -97,6 +96,9 @@ class JWTAuth:
     def update(self, path, http_status_code):
         self.path = path
         self.http_status_code = http_status_code
+        if frappe.session.data.get("profile_redirect"):
+            frappe.session.data["profile_redirect"] = False
+            frappe.session.data["jwt_original_location"] = self.path
 
     def get_login_url(self, redirect_to=None):
         login_url = self.settings.login_url
@@ -186,8 +188,14 @@ class JWTAuth:
         return response
 
     def render(self):
+        # debug
+        frappe.log_error("JWT Auth Debug", f"Rendering {self.path}")
+        # Handle logout requests
+        if self.path.startswith("logout"):
+            return self.render_redirect(self.get_logout_url())
+
         # Handle login requests
-        if self.settings.enable_login and self.path.startswith("login"):
+        if self.path.startswith("login"):
             params = frappe.local.request.args
             redirect_to = params.get("redirect-to")
             return self.render_redirect(self.get_login_url(redirect_to))
@@ -261,6 +269,12 @@ def handle_redirects(response=None, request=None):
     """After request handler for JWT auth redirects"""
     if not response or not hasattr(frappe, "session"):
         return response
+    
+    if response.get("location"):
+        frappe.log_error(
+            "JWT Auth Debug",
+			f"Redirecting to {response.get('location')}",
+		)
 
     redirect_to = frappe.session.data.pop("jwt_auth_redirect", None)
     if not redirect_to:

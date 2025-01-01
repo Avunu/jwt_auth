@@ -26,7 +26,3 @@ website_context = {
         {"label": "Log out", "url": "/?cmd=jwt_auth.auth.web_logout"}  # Custom logout URL
     ]
 }
-
-website_route_rules = [
-	{"from_route": "/logout", "to_route": "/?cmd=jwt_auth.auth.web_logout"}
-]
