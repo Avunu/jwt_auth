@@ -4,6 +4,8 @@ app_license = "mit"
 app_name = "jwt_auth"
 app_publisher = "Avunu LLC"
 app_title = "JWT Auth"
+
+after_request = ["jwt_auth.auth.handle_redirects"]
 auth_hooks = ["jwt_auth.auth.validate_auth"]
 on_logout = ["jwt_auth.auth.on_logout"]
 page_renderer = ["jwt_auth.auth.SessionJWTAuth"]
@@ -24,3 +26,7 @@ website_context = {
         {"label": "Log out", "url": "/?cmd=jwt_auth.auth.web_logout"}  # Custom logout URL
     ]
 }
+
+website_route_rules = [
+	{"from_route": "/logout", "to_route": "/?cmd=jwt_auth.auth.web_logout"}
+]
