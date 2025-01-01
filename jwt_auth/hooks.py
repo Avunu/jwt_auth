@@ -12,6 +12,12 @@ app_include_js = [
 	"app.bundle.js"
 ]
 
+doc_events = {
+    "Contact": {
+        "on_update": "jwt_auth.jwt_auth.hooks.contact.on_update",
+    }
+}
+
 website_context = {
     "post_login": [
         {"label": "My Account", "url": "/me"},
