@@ -42,10 +42,21 @@ class JWTAuth:
 		if not self.user_email:
 			return
 		user_email = self.claims.get("email") if self.claims.get("email") else None
-		if user_email and frappe.db.exists("User", {"email": user_email}):
-			frappe.local.login_manager.login_as(user_email)
-		elif self.settings.enable_user_reg:
-			self.register_user(user_email)
+		if user_email:
+			# Check if the user exists
+			Contact = frappe.qb.DocType("Contact")
+			ContactEmail = frappe.qb.DocType("Contact Email")
+			user_exists = (
+       			frappe.qb.from_(Contact)
+				.select("user")
+       			.join(ContactEmail)
+				.on(Contact.name == ContactEmail.parent)
+				.where(ContactEmail.email_id == user_email)
+			).run(as_dict=True)
+			if user_exists:
+				frappe.local.login_manager.login_as(user_exists[0].get("user"))
+			elif self.settings.enable_user_reg:
+				self.register_user(user_email)
 
 	def validate_auth(self):
 		if self.can_auth():
@@ -191,7 +202,7 @@ class JWTAuth:
 		"""
 		Creates a user from existing contact data.
 		"""
-		contact = frappe.db.exists("Contact", {"email_id": user_email})
+		contact = frappe.db.get_value("Contact Email", {"email_id": user_email}, "parent")
 		if contact:
 			contact = frappe.get_doc("Contact", contact)
 			frappe.get_doc(
