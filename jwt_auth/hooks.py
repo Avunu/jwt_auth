@@ -8,10 +8,9 @@ app_title = "JWT Auth"
 after_request = ["jwt_auth.auth.handle_redirects"]
 auth_hooks = ["jwt_auth.auth.validate_auth"]
 on_logout = ["jwt_auth.auth.on_logout"]
-page_renderer = ["jwt_auth.auth.SessionJWTAuth"]
 
 app_include_js = [
-	"app.bundle.js"
+    "app.bundle.js"
 ]
 
 doc_events = {
@@ -23,6 +22,6 @@ doc_events = {
 website_context = {
     "post_login": [
         {"label": "My Account", "url": "/me"},
-        {"label": "Log out", "url": "/?cmd=jwt_auth.auth.web_logout"}  # Custom logout URL
+        {"label": "Log out", "url": "/?cmd=jwt_auth.auth.web_logout"}
     ]
 }

@@ -3,28 +3,15 @@ import json
 import jwt
 import requests
 from urllib.parse import quote
-from werkzeug.wrappers import Response
-from frappe.website.page_renderers.document_page import DocumentPage
-from frappe.website.page_renderers.list_page import ListPage
-from frappe.website.page_renderers.not_found_page import NotFoundPage
-from frappe.website.page_renderers.print_page import PrintPage
-from frappe.website.page_renderers.redirect_page import RedirectPage
-from frappe.website.page_renderers.static_page import StaticPage
-from frappe.website.page_renderers.template_page import TemplatePage
-from frappe.website.page_renderers.web_form import WebFormPage
-from frappe.website.path_resolver import PathResolver
-
 
 class SessionJWTAuth:
     def __init__(self, path=None, http_status_code=None):
         if not hasattr(frappe.local, "jwt_auth"):
             frappe.local.jwt_auth = JWTAuth(path, http_status_code)
         elif path or http_status_code:
-            frappe.log_error("JWT Auth Debug", f"Updating path to {path}")
             frappe.local.jwt_auth.update(path, http_status_code)
 
     def __getattr__(self, name):
-        # Delegate all attribute access to the cached JWTAuth instance
         return getattr(frappe.local.jwt_auth, name)
 
 
@@ -45,7 +32,6 @@ class JWTAuth:
         user_email = self.claims.get("email") if self.claims.get("email") else None
         if user_email:
             frappe.log_error(f"Attempting auth for {user_email}", "JWT Auth Debug")
-            # Check if the user exists
             Contact = frappe.qb.DocType("Contact")
             ContactEmail = frappe.qb.DocType("Contact Email")
             user_exists = (
@@ -56,20 +42,15 @@ class JWTAuth:
                 .where(ContactEmail.email_id == user_email)
             ).run(as_dict=True)
             if user_exists:
-                frappe.log_error(
-                    f"Existing user found for {user_email}", "JWT Auth Debug"
-                )
+                frappe.log_error(f"Existing user found for {user_email}", "JWT Auth Debug")
                 frappe.local.login_manager.login_as(user_exists[0].get("user"))
             elif self.settings.enable_user_reg:
-                frappe.log_error(
-                    f"Creating new user for {user_email}", "JWT Auth Debug"
-                )
+                frappe.log_error(f"Creating new user for {user_email}", "JWT Auth Debug")
                 self.register_user(user_email)
                 frappe.local.login_manager.login_as(user_email)
-                # Store redirect in session for after_request handling
                 if self.redirect_to:
                     frappe.session.data["jwt_auth_redirect"] = self.redirect_to
-                    frappe.session.data["profile_redirect"] = True
+                    frappe.cache().set_value(f"jwt_original_location_{user_email}",frappe.local.request.path)
 
     def validate_auth(self):
         if self.can_auth():
@@ -82,23 +63,17 @@ class JWTAuth:
             return False
         if not self.settings.enabled:
             return False
+        if frappe.flags.get("jwt_logout_redirect", False):
+            return False
         self.token = self.get_token(frappe.local.request)
         if not self.token:
             return False
         if self.is_valid_token(self.token):
             return True
 
-    def can_render(self):
-        return self.settings.enabled and (
-            self.settings.enable_login or self.redirect_to
-        )
-
     def update(self, path, http_status_code):
         self.path = path
         self.http_status_code = http_status_code
-        if frappe.session.data.get("profile_redirect"):
-            frappe.session.data["profile_redirect"] = False
-            frappe.session.data["jwt_original_location"] = self.path
 
     def get_login_url(self, redirect_to=None):
         login_url = self.settings.login_url
@@ -126,29 +101,6 @@ class JWTAuth:
             public_keys.append(public_key)
         return public_keys
 
-    def get_renderer(self):
-        path_resolver = PathResolver(self.path, self.http_status_code)
-        # remove the current class from the custom renderers
-        custom_renderers = [
-            renderer
-            for renderer in path_resolver.get_custom_page_renderers()
-            if renderer.__name__ != self.__class__.__name__
-        ]
-        renderers = [
-            *custom_renderers,
-            StaticPage,
-            WebFormPage,
-            DocumentPage,
-            TemplatePage,
-            ListPage,
-            PrintPage,
-        ]
-        for renderer in renderers:
-            renderer_instance = renderer(self.path, self.http_status_code)
-            if renderer_instance.can_render():
-                return renderer_instance
-        return NotFoundPage(self.path, self.http_status_code)
-
     def get_token(self, request):
         token = (
             request.cookies.get(self.settings.jwt_header)
@@ -164,7 +116,6 @@ class JWTAuth:
     def is_valid_token(self, token):
         keys = self.get_public_keys()
         secret = self.settings.get_password("jwt_private_secret")
-        # Loop through the keys
         valid_token = False
         for key in keys:
             try:
@@ -180,48 +131,12 @@ class JWTAuth:
                 pass
         return valid_token
 
-    def render_redirect(self, path):
-        response = Response()
-        response.headers["Location"] = path
-        response.status_code = 302
-        self.redirect_to = None
-        return response
-
-    def render(self):
-        # debug
-        frappe.log_error("JWT Auth Debug", f"Rendering {self.path}")
-        # Handle logout requests
-        if self.path.startswith("logout"):
-            return self.render_redirect(self.get_logout_url())
-
-        # Handle login requests
-        if self.path.startswith("login"):
-            params = frappe.local.request.args
-            redirect_to = params.get("redirect-to")
-            return self.render_redirect(self.get_login_url(redirect_to))
-
-        # Regular page rendering
-        try:
-            if not self.settings.enable_login:
-                return self.get_renderer().render()
-
-            if frappe.session.user == "Guest":
-                return self.render_redirect(self.get_login_url(self.path))
-
-            return self.get_renderer().render()
-        except frappe.PermissionError:
-            return self.render_redirect(self.get_login_url(self.path))
-
     def register_user(self, user_email):
-        """
-        Creates a user from existing contact data or creates new user with minimal info.
-        """
         contact = frappe.db.get_value(
             "Contact Email", {"email_id": user_email}, "parent"
         )
 
         if contact:
-            # Create user from existing contact
             contact = frappe.get_doc("Contact", contact)
             user = frappe.get_doc(
                 {
@@ -241,14 +156,12 @@ class JWTAuth:
             )
             user.insert(ignore_permissions=True)
 
-            # Link contact to user
             contact.user = user_email
             contact.save(ignore_permissions=True)
 
             if not contact.first_name:
                 self.redirect_to = f"/update-profile/{user_email}/edit"
         else:
-            # Create new user with minimal info
             user = frappe.get_doc(
                 {
                     "doctype": "User",
@@ -259,35 +172,29 @@ class JWTAuth:
             )
             user.insert(ignore_permissions=True)
 
-            # Always redirect new users to profile update
             self.redirect_to = f"/update-profile/{user_email}/edit"
 
         frappe.db.commit()
 
 
 def handle_redirects(response=None, request=None):
-    """After request handler for JWT auth redirects"""
     if not response or not hasattr(frappe, "session"):
-        return response
+        return
     
-    if response.get("location"):
-        frappe.log_error(
-            "JWT Auth Debug",
-			f"Redirecting to {response.get('location')}",
-		)
+    if frappe.session.get("user") == "Guest" and frappe.flags.get("jwt_logout_redirect"):
+        response.status_code = 302
+        response.headers["Location"] = frappe.flags.pop("jwt_logout_redirect")
+        return
 
-    redirect_to = frappe.session.data.pop("jwt_auth_redirect", None)
-    if not redirect_to:
-        redirect_to = frappe.session.data.pop("jwt_original_location", None)
+    redirect_to = frappe.session.data.pop("jwt_auth_redirect", False)
+    if not redirect_to and request.path == "/me":
+        cache_key = f"jwt_original_location_{frappe.session.user}"
+        redirect_to = frappe.cache().get_value(cache_key)
+        frappe.cache().delete_value(cache_key)
     if redirect_to:
-        # debug
         frappe.log_error(
-            "JWT Auth Debug",
             f"Redirecting to {redirect_to}",
-        )
-        frappe.log_error(
-            "JWT Auth Debug Original Response",
-            frappe.session.data.get("jwt_original_location"),
+            "JWT Auth Debug",
         )
         response.status_code = 302
         response.headers["Location"] = redirect_to
@@ -308,7 +215,7 @@ def jwt_logout():
 @frappe.whitelist()
 def on_logout():
     auth = SessionJWTAuth()
-    auth.redirect_to = auth.get_logout_url()
+    frappe.flags["jwt_logout_redirect"] = auth.get_logout_url()
 
 
 @frappe.whitelist()
