@@ -31,7 +31,6 @@ class JWTAuth:
             return
         user_email = self.claims.get("email") if self.claims.get("email") else None
         if user_email:
-            frappe.log_error(f"Attempting auth for {user_email}", "JWT Auth Debug")
             Contact = frappe.qb.DocType("Contact")
             ContactEmail = frappe.qb.DocType("Contact Email")
             user_exists = (
@@ -41,11 +40,9 @@ class JWTAuth:
                 .on(Contact.name == ContactEmail.parent)
                 .where(ContactEmail.email_id == user_email)
             ).run(as_dict=True)
-            if user_exists:
-                frappe.log_error(f"Existing user found for {user_email}", "JWT Auth Debug")
+            if user_exists[0].get('user', False):
                 frappe.local.login_manager.login_as(user_exists[0].get("user"))
             elif self.settings.enable_user_reg:
-                frappe.log_error(f"Creating new user for {user_email}", "JWT Auth Debug")
                 self.register_user(user_email)
                 frappe.local.login_manager.login_as(user_email)
                 if self.redirect_to:
@@ -192,10 +189,6 @@ def handle_redirects(response=None, request=None):
         redirect_to = frappe.cache().get_value(cache_key)
         frappe.cache().delete_value(cache_key)
     if redirect_to:
-        frappe.log_error(
-            f"Redirecting to {redirect_to}",
-            "JWT Auth Debug",
-        )
         response.status_code = 302
         response.headers["Location"] = redirect_to
 
