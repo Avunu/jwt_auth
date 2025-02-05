@@ -40,7 +40,7 @@ class JWTAuth:
                 .on(Contact.name == ContactEmail.parent)
                 .where(ContactEmail.email_id == user_email)
             ).run(as_dict=True)
-            if user_exists[0].get('user', False):
+            if user_exists and user_exists[0].get('user', False):
                 frappe.local.login_manager.login_as(user_exists[0].get("user"))
             elif self.settings.enable_user_reg:
                 self.register_user(user_email)
