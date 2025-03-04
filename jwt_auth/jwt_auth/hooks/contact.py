@@ -1,28 +1,29 @@
 import frappe
+from frappe.core.doctype.user.user import User
 
 
 def on_update(doc, method):
 
-    if "[Change Me]" in doc.name and doc.full_name:
+    if "[Change Me]" in doc.name and doc.get("full_name"):
         frappe.enqueue(
             "frappe.model.rename_doc.rename_doc",
-            doctype=doc.doctype,
-            old=doc.name,
-            new=doc.full_name,
+            doctype=doc.get("doctype"),
+            old=doc.get("name"),
+            new=doc.get("full_name"),
             force=False,
             show_alert=True,
         )
 
-    if doc.user:
+    if doc.get("user", False):
         # Update user's fields from contact
         user_fields = {
-            "first_name": doc.first_name,
-            "middle_name": doc.middle_name,
-            "last_name": doc.last_name,
-            "full_name": doc.full_name,
-            "phone": doc.phone,
-            "mobile_no": doc.mobile_no,
-            "gender": doc.gender,
+            "first_name": doc.get("first_name", None),
+            "middle_name": doc.get("middle_name", None),
+            "last_name": doc.get("last_name", None),
+            "full_name": doc.get("full_name", None),
+            "phone": doc.get("phone", None),
+            "mobile_no": doc.get("mobile_no", None),
+            "gender": doc.get("gender", None),
         }
 
         # Only update fields that have changed
@@ -33,4 +34,6 @@ def on_update(doc, method):
         }
 
         if update_fields:
-            frappe.db.set_value("User", doc.user, update_fields)
+            user = User("User", doc.get("user"))
+            user.update(update_fields)
+            user.save(ignore_permissions=True)
