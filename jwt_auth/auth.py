@@ -234,6 +234,14 @@ def handle_redirects(response: Optional[Response], request: Request) -> None:
         return
 
     redirect_to: Optional[str] = frappe.session.data.pop("jwt_auth_redirect", False)
+
+    if getattr(request, "path", None) == "login":
+        auth = SessionJWTAuth()
+        if auth.settings.enabled and auth.settings.enable_login:
+            redirect_param = "redirect-to"
+            params = getattr(request, "args", {})
+            redirect_to = auth.get_login_url(params.get(redirect_param, None))
+
     if not redirect_to and request.path == "/me":
         cache = None
         if frappe.cache is not None:
