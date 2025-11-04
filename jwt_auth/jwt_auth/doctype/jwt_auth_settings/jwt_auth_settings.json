@@ -11,6 +11,7 @@
   "jwt_header",
   "jwks_url",
   "jwt_private_secret",
+  "column_break_sqzs",
   "enable_login",
   "login_url",
   "logout_url",
@@ -24,29 +25,37 @@
   {
    "fieldname": "jwt_header",
    "fieldtype": "Data",
+   "in_list_view": 1,
    "label": "JWT Cookie/Header",
    "mandatory_depends_on": "enabled",
+   "reqd": 1,
    "width": "800px"
   },
   {
    "fieldname": "jwks_url",
    "fieldtype": "Data",
+   "in_list_view": 1,
    "label": "JWKS URL",
    "mandatory_depends_on": "enabled",
+   "reqd": 1,
    "width": "100%"
   },
   {
    "fieldname": "jwt_private_secret",
    "fieldtype": "Password",
+   "in_list_view": 1,
    "label": "JWT Private Secret",
    "mandatory_depends_on": "enabled",
+   "reqd": 1,
    "width": "100%"
   },
   {
    "fieldname": "login_url",
    "fieldtype": "Data",
+   "in_list_view": 1,
    "label": "Login URL",
    "mandatory_depends_on": "enable_login",
+   "reqd": 1,
    "width": "100%"
   },
   {
@@ -78,14 +87,20 @@
    "fieldname": "logout_url",
    "fieldtype": "Data",
    "label": "Logout URL",
+   "reqd": 1,
    "width": "100%"
+  },
+  {
+   "fieldname": "column_break_sqzs",
+   "fieldtype": "Column Break"
   }
  ],
+ "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2024-11-29 20:28:17.623754",
- "modified_by": "Administrator",
+ "modified": "2025-11-04 14:17:06.731388",
+ "modified_by": "kevin@avu.nu",
  "module": "JWT Auth",
  "name": "JWT Auth Settings",
  "owner": "Administrator",
@@ -101,6 +116,7 @@
    "write": 1
   }
  ],
+ "row_format": "Dynamic",
  "sort_field": "creation",
  "sort_order": "DESC",
  "states": []
