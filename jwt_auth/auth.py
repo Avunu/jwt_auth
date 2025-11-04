@@ -10,8 +10,9 @@ from frappe.utils.redis_wrapper import setup_cache
 from jwt.algorithms import RSAAlgorithm
 from werkzeug import Request, Response
 
-from jwt_auth.jwt_auth.doctype.jwt_auth_settings.jwt_auth_settings import \
-    JWTAuthSettings
+from jwt_auth.jwt_auth.doctype.jwt_auth_settings.jwt_auth_settings import (
+    JWTAuthSettings,
+)
 
 
 class SessionJWTAuth:
@@ -220,15 +221,6 @@ def handle_redirects(response: Optional[Response], request: Request) -> None:
     if not response or not hasattr(frappe, "session") or not frappe.session:
         return
 
-    cache = None
-    if frappe.cache is not None:
-        cache = frappe.cache()
-
-    if not cache:
-        cache = setup_cache()
-
-    assert cache is not None, "Cache must be initialized"
-
     if frappe.session.get("user") == "Guest" and frappe.flags.get(
         "jwt_logout_redirect"
     ):
@@ -243,6 +235,11 @@ def handle_redirects(response: Optional[Response], request: Request) -> None:
 
     redirect_to: Optional[str] = frappe.session.data.pop("jwt_auth_redirect", False)
     if not redirect_to and request.path == "/me":
+        cache = None
+        if frappe.cache is not None:
+            cache = frappe.cache()
+        if not cache:
+            cache = setup_cache()
         cache_key: str = f"jwt_original_location_{frappe.session.user}"
         redirect_to = cache.get_value(cache_key)
         cache.delete_value(cache_key)
