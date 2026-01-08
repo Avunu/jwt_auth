@@ -12,6 +12,7 @@ def on_update(doc, method):
             new=doc.get("full_name"),
             force=False,
             show_alert=True,
+            ignore_permissions=True,
         )
 
     if doc.get("user", False):
