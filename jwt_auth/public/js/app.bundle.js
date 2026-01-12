@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
 	// Wait for frappe to be initialized
 	const onFrappeApplication = () => {
 		if (window.frappe?.app) {
@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
 						} else {
 							me.redirect_to_login();
 						}
-					}
+					},
 				});
 			};
 		} else {

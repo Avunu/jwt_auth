@@ -12,14 +12,14 @@ export_python_type_annotations = True
 on_logout = ["jwt_auth.auth.on_logout"]
 
 doc_events = {
-    "Contact": {
-        "on_update": "jwt_auth.jwt_auth.hooks.contact.on_update",
-    }
+	"Contact": {
+		"on_update": "jwt_auth.jwt_auth.hooks.contact.on_update",
+	}
 }
 
 website_context = {
-    "post_login": [
-        {"label": "My Account", "url": "/me"},
-        {"label": "Log out", "url": "/?cmd=jwt_auth.auth.web_logout"},
-    ]
+	"post_login": [
+		{"label": "My Account", "url": "/me"},
+		{"label": "Log out", "url": "/?cmd=jwt_auth.auth.web_logout"},
+	]
 }

@@ -2,8 +2,7 @@
 # See license.txt
 
 # import frappe
-from frappe.tests import IntegrationTestCase, UnitTestCase
-
+# from frappe.tests import IntegrationTestCase, UnitTestCase
 
 # On IntegrationTestCase, the doctype test records and all
 # link-field test record depdendencies are recursively loaded
@@ -12,19 +11,19 @@ EXTRA_TEST_RECORD_DEPENDENCIES = []  # eg. ["User"]
 IGNORE_TEST_RECORD_DEPENDENCIES = []  # eg. ["User"]
 
 
-class TestJWTAuthSettings(UnitTestCase):
-	"""
-	Unit tests for JWTAuthSettings.
-	Use this class for testing individual functions and methods.
-	"""
+# class TestJWTAuthSettings(UnitTestCase):
+# 	"""
+# 	Unit tests for JWTAuthSettings.
+# 	Use this class for testing individual functions and methods.
+# 	"""
 
-	pass
+# 	pass
 
 
-class TestJWTAuthSettings(IntegrationTestCase):
-	"""
-	Integration tests for JWTAuthSettings.
-	Use this class for testing interactions between multiple components.
-	"""
+# class TestJWTAuthSettings(IntegrationTestCase):
+# 	"""
+# 	Integration tests for JWTAuthSettings.
+# 	Use this class for testing interactions between multiple components.
+# 	"""
 
-	pass
+# 	pass
