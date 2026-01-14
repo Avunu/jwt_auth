@@ -16,6 +16,11 @@ if TYPE_CHECKING:
 class TestJWTAuthUserRegistration(IntegrationTestCase):
 	"""Test cases for JWT Auth user registration functionality."""
 
+	@classmethod
+	def tearDownClass(cls) -> None:
+		frappe.db.rollback()
+		super().tearDownClass()
+
 	def _get_jwt_auth_instance(self) -> Any:
 		"""Get a JWTAuth instance for testing."""
 		from jwt_auth.auth import JWTAuth
@@ -136,6 +141,11 @@ class TestJWTAuthUserRegistration(IntegrationTestCase):
 
 class TestJWTAuthURLGeneration(IntegrationTestCase):
 	"""Test cases for JWT Auth URL generation."""
+
+	@classmethod
+	def tearDownClass(cls) -> None:
+		frappe.db.rollback()
+		super().tearDownClass()
 
 	def _get_jwt_auth_instance(self) -> Any:
 		"""Get a JWTAuth instance for testing."""
