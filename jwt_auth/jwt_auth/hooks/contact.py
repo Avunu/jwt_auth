@@ -3,7 +3,7 @@ from frappe.core.doctype.user.user import User
 
 
 def on_update(doc, method):
-	if "[Change Me]" in doc.name and doc.get("full_name"):
+	if "[Change Me]" in doc.name and doc.get("full_name") and doc.get("full_name") != "[Change Me]":
 		frappe.enqueue(
 			"frappe.model.rename_doc.rename_doc",
 			doctype=doc.get("doctype"),
