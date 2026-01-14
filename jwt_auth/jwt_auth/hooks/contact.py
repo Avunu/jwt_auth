@@ -1,18 +1,26 @@
+from typing import TYPE_CHECKING, cast
+
 import frappe
 from frappe.core.doctype.user.user import User
 
+if TYPE_CHECKING:
+	from frappe.contacts.doctype.contact.contact import Contact
 
-def on_update(doc, method):
-	if "[Change Me]" in doc.name and doc.get("full_name") and doc.get("full_name") != "[Change Me]":
-		frappe.enqueue(
-			"frappe.model.rename_doc.rename_doc",
-			doctype=doc.get("doctype"),
-			old=doc.get("name"),
-			new=doc.get("full_name"),
-			force=False,
-			show_alert=True,
-			ignore_permissions=True,
-		)
+
+def on_update(doc: Contact, _method):
+	if "[Change Me]" in str(doc.name) and doc.get("full_name"):
+		full_name = doc._get_full_name()
+		if full_name != "[Change Me]":
+			new_name = doc.autoname()
+			frappe.enqueue(
+				"frappe.model.rename_doc.rename_doc",
+				doctype=doc.get("doctype"),
+				old=doc.get("name"),
+				new=new_name,
+				force=False,
+				show_alert=True,
+				ignore_permissions=True,
+			)
 
 	if doc.get("user", False):
 		# Update user's fields from contact
