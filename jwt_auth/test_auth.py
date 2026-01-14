@@ -62,8 +62,6 @@ class TestJWTAuthUserRegistration(IntegrationTestCase):
 		jwt_auth = self._get_jwt_auth_instance()
 		test_email = f"test{random_string(8).lower()}@example.com"
 		# Use unique phone number to avoid conflicts with existing test data
-		import random
-
 		test_phone = f"+1202555{random.randint(1000, 9999)}"
 
 		# Create contact first
