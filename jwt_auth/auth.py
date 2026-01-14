@@ -176,6 +176,7 @@ class JWTAuth:
 
 		if contact:
 			contact_doc = cast("Contact", frappe.get_doc("Contact", contact))
+			first_name = contact_doc.first_name  # Store before user creation
 			user = frappe.get_doc(
 				{
 					"doctype": "User",
@@ -195,10 +196,12 @@ class JWTAuth:
 			)
 			user.insert(ignore_permissions=True)
 
+			# Reload contact to get latest version after user.insert() triggers hooks
+			contact_doc.reload()
 			contact_doc.user = user_email
 			contact_doc.save(ignore_permissions=True)
 
-			if not contact_doc.first_name:
+			if not first_name:
 				self.redirect_to = f"/update-profile/{user_email}/edit"
 		else:
 			user = frappe.get_doc(
