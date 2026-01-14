@@ -1,14 +1,16 @@
 import json
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 from urllib.parse import quote
 
 import frappe
 import jwt
 import requests
-from frappe.contacts.doctype.contact.contact import Contact
 from frappe.utils.redis_wrapper import setup_cache
 from jwt.algorithms import RSAAlgorithm
 from werkzeug import Request, Response
+
+if TYPE_CHECKING:
+	from frappe.contacts.doctype.contact.contact import Contact
 
 from jwt_auth.jwt_auth.doctype.jwt_auth_settings.jwt_auth_settings import (
 	JWTAuthSettings,
@@ -173,21 +175,22 @@ class JWTAuth:
 		)
 
 		if contact:
-			contact_doc = Contact("Contact", contact)
+			contact_doc = cast("Contact", frappe.get_doc("Contact", contact))
 			user = frappe.get_doc(
 				{
 					"doctype": "User",
-					"email": user_email,
-					"username": user_email,
-					"first_name": contact_doc.first_name or "[Change Me]",
-					"middle_name": contact_doc.middle_name,
-					"last_name": contact_doc.last_name,
-					"full_name": contact_doc.full_name,
-					"phone": contact_doc.phone,
-					"mobile_no": contact_doc.mobile_no,
-					"gender": contact_doc.gender,
-					"send_welcome_email": 0,
 					"company_name": contact_doc.company_name,
+					"email": user_email,
+					"first_name": contact_doc.first_name or "[Change Me]",
+					"full_name": contact_doc.full_name,
+					"gender": contact_doc.gender,
+					"last_name": contact_doc.last_name,
+					"middle_name": contact_doc.middle_name,
+					"mobile_no": contact_doc.mobile_no,
+					"phone": contact_doc.phone,
+					"send_welcome_email": 0,
+					"user_type": "Website User",
+					"username": user_email,
 				}
 			)
 			user.insert(ignore_permissions=True)
@@ -204,6 +207,7 @@ class JWTAuth:
 					"email": user_email,
 					"first_name": "[Change Me]",
 					"send_welcome_email": 0,
+					"user_type": "Website User",
 				}
 			)
 			user.insert(ignore_permissions=True)
