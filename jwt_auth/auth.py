@@ -52,35 +52,43 @@ class JWTAuth:
 			return
 		user_email: str | None = self.claims.get("email") if self.claims.get("email") else None
 		if user_email:
-			Contact = frappe.qb.DocType("Contact")
-			ContactEmail = frappe.qb.DocType("Contact Email")
-			user_exists: list[dict[str, Any]] = (
-				frappe.qb.from_(Contact)
-				.select("user")
-				.join(ContactEmail)
-				.on(Contact.name == ContactEmail.parent)
-				.where(ContactEmail.email_id == user_email)
-			).run(as_dict=True)
-			if user_exists and user_exists[0].get("user", False):
-				frappe.local.login_manager.login_as(user_exists[0].get("user"))
-			elif self.settings.enable_user_reg:
-				self.register_user(user_email)
+			# First, check if the user already exists in the User table
+			user_exists_in_db = frappe.db.exists("User", user_email)
+
+			if user_exists_in_db:
+				# User exists, just login
 				frappe.local.login_manager.login_as(user_email)
-				if (
-					self.redirect_to
-					and hasattr(frappe, "session")
-					and frappe.session
-					and hasattr(frappe.session, "data")
-					and frappe.session.data is not None
-				):
-					frappe.session.data["jwt_auth_redirect"] = self.redirect_to
-					if frappe.cache is not None:
-						cache = frappe.cache()
-						if cache:
-							cache.set_value(
-								f"jwt_original_location_{user_email}",
-								frappe.local.request.path,
-							)
+			else:
+				# User doesn't exist, check contact and register if needed
+				Contact = frappe.qb.DocType("Contact")
+				ContactEmail = frappe.qb.DocType("Contact Email")
+				user_exists: list[dict[str, Any]] = (
+					frappe.qb.from_(Contact)
+					.select("user")
+					.join(ContactEmail)
+					.on(Contact.name == ContactEmail.parent)
+					.where(ContactEmail.email_id == user_email)
+				).run(as_dict=True)
+				if user_exists and user_exists[0].get("user", False):
+					frappe.local.login_manager.login_as(user_exists[0].get("user"))
+				elif self.settings.enable_user_reg:
+					self.register_user(user_email)
+					frappe.local.login_manager.login_as(user_email)
+					if (
+						self.redirect_to
+						and hasattr(frappe, "session")
+						and frappe.session
+						and hasattr(frappe.session, "data")
+						and frappe.session.data is not None
+					):
+						frappe.session.data["jwt_auth_redirect"] = self.redirect_to
+						if frappe.cache is not None:
+							cache = frappe.cache()
+							if cache:
+								cache.set_value(
+									f"jwt_original_location_{user_email}",
+									frappe.local.request.path,
+								)
 
 	def validate_auth(self) -> None:
 		if self.can_auth():
@@ -168,6 +176,10 @@ class JWTAuth:
 		return valid_token
 
 	def register_user(self, user_email: str) -> None:
+		# Check if user already exists to prevent duplicate entry errors
+		if frappe.db.exists("User", user_email):
+			return
+
 		contact: str | None = frappe.db.get_value(
 			"Contact Email",
 			{"email_id": user_email},
