@@ -138,6 +138,72 @@ class TestJWTAuthUserRegistration(IntegrationTestCase):
 			# Verify sendmail was not called
 			mock_sendmail.assert_not_called()
 
+	def test_register_user_handles_existing_user(self) -> None:
+		"""Test that register_user gracefully handles when user already exists."""
+		jwt_auth = self._get_jwt_auth_instance()
+		test_email = f"test{random_string(8).lower()}@example.com"
+
+		# Create a user first
+		existing_user = frappe.get_doc(
+			{
+				"doctype": "User",
+				"email": test_email,
+				"first_name": "Existing",
+				"last_name": "User",
+				"user_type": "Website User",
+			}
+		)
+		existing_user.insert(ignore_permissions=True)
+
+		# Verify user exists
+		self.assertTrue(frappe.db.exists("User", test_email))
+
+		# Try to register the same user again - should not raise error
+		jwt_auth.register_user(test_email)
+
+		# Verify user still exists and was not duplicated
+		self.assertTrue(frappe.db.exists("User", test_email))
+		user: User = frappe.get_doc("User", test_email)  # type: ignore[assignment]
+		# Verify original user data is preserved
+		self.assertEqual(user.first_name, "Existing")
+		self.assertEqual(user.last_name, "User")
+
+	def test_auth_handles_existing_user_without_contact(self) -> None:
+		"""Test that auth() handles existing user without associated contact."""
+		from jwt_auth.auth import JWTAuth
+
+		test_email = f"test{random_string(8).lower()}@example.com"
+
+		# Create a user without an associated contact
+		existing_user = frappe.get_doc(
+			{
+				"doctype": "User",
+				"email": test_email,
+				"first_name": "John",
+				"last_name": "Doe",
+				"user_type": "Website User",
+			}
+		)
+		existing_user.insert(ignore_permissions=True)
+
+		# Mock the JWT auth flow
+		jwt_auth = JWTAuth()
+		jwt_auth.claims = {"email": test_email}
+		jwt_auth.settings.enable_user_reg = True
+
+		# Mock login_manager to track login calls
+		mock_login_manager = MagicMock()
+		frappe.local.login_manager = mock_login_manager
+
+		# Call auth() - should not raise DuplicateEntryError
+		jwt_auth.auth()
+
+		# Verify login was called with the existing user
+		mock_login_manager.login_as.assert_called_once_with(test_email)
+
+		# Verify no duplicate user was created
+		self.assertTrue(frappe.db.exists("User", test_email))
+
 
 class TestJWTAuthURLGeneration(IntegrationTestCase):
 	"""Test cases for JWT Auth URL generation."""
