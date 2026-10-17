@@ -10,9 +10,10 @@
 		"format": "oxfmt",
 		"format:check": "oxfmt --check",
 		"lint": "oxlint",
+		"typecheck": "tsc --build tsconfig.json",
 		"lint:py": "uv run --frozen --project tools ruff check . && uv run --frozen --project tools ruff format --check .",
 		"typecheck:py": "uv run --frozen --project tools ty check --python \"${FRAPPE_BENCH_ROOT:-.frappe-nix/bench}/env\"",
-		"check": "yarn -s format:check && yarn -s lint"
+		"check": "yarn -s format:check && yarn -s lint && yarn -s typecheck"
 	},
 	"devDependencies": {
 		"@types/node": "^26.6.4",
