@@ -19,6 +19,10 @@ from jwt_auth.jwt_auth.doctype.jwt_auth_settings.jwt_auth_settings import (
 	JWTAuthSettings,
 )
 
+JWKS_TIMEOUT_SECONDS = 10
+
+logger = frappe.logger("jwt_auth")
+
 
 class JWTAuth:
 	path: str | None
@@ -127,7 +131,8 @@ class JWTAuth:
 		return logout_url
 
 	def get_public_keys(self) -> list[Any]:
-		r: requests.Response = requests.get(self.settings.jwks_url)
+		r: requests.Response = requests.get(self.settings.jwks_url, timeout=JWKS_TIMEOUT_SECONDS)
+		r.raise_for_status()
 		public_keys: list[Any] = []
 		jwk_set: dict[str, Any] = r.json()
 		for key_dict in jwk_set["keys"]:
@@ -148,22 +153,29 @@ class JWTAuth:
 		return token
 
 	def is_valid_token(self, token: str) -> bool:
-		keys: list[Any] = self.get_public_keys()
-		secret: str = str(self.settings.get_password("jwt_private_secret"))
-		valid_token: bool = False
+		# The secret is the audience the token must be issued for. Without one, any token the identity
+		# provider signed for any application would pass, so a missing secret rejects every token.
+		audience: str | None = self.settings.get_password("jwt_private_secret", raise_exception=False)
+		if not audience:
+			logger.warning("JWT Auth Settings has no JWT Private Secret; rejecting the token")
+			return False
+		try:
+			keys: list[Any] = self.get_public_keys()
+		except (requests.RequestException, ValueError, KeyError) as e:
+			logger.warning(f"could not load the JWKS from {self.settings.jwks_url}: {e!r}")
+			return False
 		for key in keys:
 			try:
 				self.claims = jwt.decode(
 					token,
 					key=key,
-					audience=secret,
+					audience=audience,
 					algorithms=["RS256"],
 				)
-				valid_token = True
-				break
-			except Exception as _e:
-				pass
-		return valid_token
+			except jwt.PyJWTError, ValueError, TypeError:
+				continue
+			return True
+		return False
 
 	def register_user(self, user_email: str) -> None:
 		# Check if user already exists to prevent duplicate entry errors
@@ -173,7 +185,7 @@ class JWTAuth:
 		contact: str | None = frappe.db.get_value(
 			"Contact Email",
 			{"email_id": user_email},
-			"parent",  # type: ignore
+			"parent",
 		)
 
 		if contact:
@@ -219,7 +231,9 @@ class JWTAuth:
 
 			self.redirect_to = f"/update-profile/{user_email}/edit"
 
-		frappe.db.commit()
+		# Registration runs inside the auth hook, usually on a GET, which Frappe rolls back at the end of
+		# the request. Ask for the commit instead of committing mid-request.
+		frappe.local.flags.commit = True
 
 
 class SessionJWTAuth:

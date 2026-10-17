@@ -7,25 +7,25 @@ For license information, please see license.txt-->
 
 ## Features
 
-- **Provider-Based Architecture:**  
-  Easily switch between different JWT providers (e.g., Cloudflare Access) by selecting a provider in the **JWT Auth Settings**.
+- **Any JWKS-based identity provider:**  
+  Tokens are RS256 JWTs verified against the provider's JWKS endpoint and checked for your application's audience. Cloudflare Access is the provider this app is used with.
 
 - **Automatic Login and Registration:**  
   If the incoming JWT is valid and the user exists, they are immediately logged in. If the user does not exist but user registration is enabled, a new user will be created from existing `Contact` information or a placeholder user will be created, prompting profile updates.
 
 - **Customizable Login and Logout URLs:**  
-  Providers can define their own login and logout endpoints. This allows deep integration with various identity management and single sign-on (SSO) solutions.
+  The login and logout URLs and the redirect parameter are settings, so the app works with any single sign-on (SSO) front door that issues JWTs.
 
-- **Flexible Hooks:**
-  - `auth_hooks = ["jwt_auth.auth.validate_auth"]` ensures JWT validation occurs on every request.
-  - `on_logout = ["jwt_auth.auth.on_logout"]` allows custom behavior on user logout.
-  - A custom `page_renderer` is included to streamline the authentication and redirection flow.
+- **Hooks:**
+  - `auth_hooks = ["jwt_auth.auth.validate_auth"]` validates the JWT on every request.
+  - `on_logout = ["jwt_auth.auth.on_logout"]` sends the user to the provider's logout URL.
+  - `after_request = ["jwt_auth.auth.handle_redirects"]` applies the login, logout and post-registration redirects.
+  - The desk's **Log out** goes through `jwt_auth.auth.jwt_logout`, so the provider's session ends too.
 
 ## Prerequisites
 
-- Frappe Framework (v15+ recommended, though it may work on other versions).
+- Frappe Framework v16.
 - An existing Identity Provider (IdP) that issues JWT tokens, such as Cloudflare Access.
-- `requests` Python library (typically included by default in Frappe environments).
 
 ## Installation
 
@@ -38,25 +38,15 @@ bench --site your-site-name install-app jwt_auth
 
 ## Configuration
 
-1. **JWT Auth Settings:**  
-   In Frappe, open **JWT Auth Settings** from the desk search.
+**JWT Auth Settings** (open it from the desk search):
 
-   - **Enabled:** Check this to enable JWT-based authentication.
-   - **Enable Login:** Check to redirect unauthenticated users to the provider’s login.
-   - **Enable User Reg:** Allow the creation of new users if they do not exist.
-   - **Provider:** Select the provider (e.g., "Cloudflare Access").
-
-   For **Cloudflare Access**:
-   - **team_name:** Your Cloudflare Access team name.
-   - **aud_tag:** The AUD (audience) tag issued by Cloudflare.
-   - **jwt_private_secret:** The expected JWT "audience" or secret used by the JWT library to validate the token’s audience.
-
-   After saving, your configuration will guide the JWTAuth provider logic.
-
-2. **Provider-Specific Fields:**  
-   Each provider class handles URL generation, JWKS endpoints, and tokens differently. For Cloudflare Access:
-   - The JWKS URL is automatically derived from `team_name`.
-   - The `Cf-Access-Token` header or cookie is used for token retrieval.
+- **Enable JWT User Auth:** turn JWT-based authentication on.
+- **Enable New User Registration:** create a user when a valid token names an email with no user yet.
+- **Override Frappe Login:** send unauthenticated users to the provider's login URL.
+- **JWT Cookie/Header:** the cookie or header that carries the token (for Cloudflare Access, `CF_Authorization` or `Cf-Access-Jwt-Assertion`).
+- **JWKS URL:** the provider's public keys (for Cloudflare Access, `https://<team>.cloudflareaccess.com/cdn-cgi/access/certs`).
+- **JWT Private Secret:** the audience the token must be issued for (for Cloudflare Access, the application's AUD tag). Without it, every token is rejected.
+- **Login URL**, **Logout URL** and **Redirect Param:** where to send users to log in and out, and the query parameter that carries the page to return to.
 
 ## Usage
 
@@ -69,24 +59,17 @@ bench --site your-site-name install-app jwt_auth
 - **Automatic Redirection:**  
   Unauthenticated users are redirected to the login URL. If registration is enabled and the user does not exist, a new user is created and optionally redirected to a profile update page.
 
-## Contributing New Providers
-
-1. Create a new provider class in `jwt_auth/providers.py` inheriting from `BaseProvider`.
-2. Implement `get_jwks_url()`, `get_login_url()`, `get_logout_url()`, and any other required properties.
-3. Update the **JWT Auth Settings** DocType to include the necessary fields for your new provider.
-4. Add logic in `auth.py`’s `get_provider()` method to instantiate your new provider class.
-
 ## Troubleshooting
 
 - **Invalid Token Errors:**  
-  Check that the `jwt_private_secret` (audience) and provider settings are correct, and that your IdP’s JWKS URL is reachable.
+  Check that **JWT Private Secret** (the audience) is set and correct, and that the **JWKS URL** is reachable from the server.
 
 - **Users Not Created:**  
   Make sure `Enable User Reg` is checked and that the user’s email is present in the JWT claims. If user registration logic relies on the `Contact` doctype, ensure `Contact` records exist, or fallback logic creates a placeholder user.
 
 - **Redirect Loops:**  
-  If you experience redirect loops, verify that you are receiving a valid token from your IdP. Confirm that the token is set in the correct header or cookie as expected by the provider class.
+  If you experience redirect loops, verify that you are receiving a valid token from your IdP. Confirm that the token arrives in the header or cookie named in **JWT Cookie/Header**.
 
 ## License
 
-MIT License. See [LICENSE](./LICENSE) for more details.
+MIT License. See [license.txt](./license.txt) for more details.

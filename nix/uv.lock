@@ -1167,10 +1167,14 @@ name = "jwt-auth"
 source = { editable = "apps/jwt_auth" }
 dependencies = [
     { name = "pyjwt" },
+    { name = "requests" },
 ]
 
 [package.metadata]
-requires-dist = [{ name = "pyjwt", specifier = ">=2.13,<3" }]
+requires-dist = [
+    { name = "pyjwt", specifier = ">=2.13,<3" },
+    { name = "requests", specifier = ">=2.32,<3" },
+]
 
 [[package]]
 name = "jwt-auth-bench"

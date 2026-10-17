@@ -2,7 +2,7 @@
 # For license information, please see license.txt
 
 app_description = "JWT Auth"
-app_email = "kevin@avu.nu"
+app_email = "mail@avu.nu"
 app_include_js = ["app.bundle.js"]
 app_license = "mit"
 app_name = "jwt_auth"
