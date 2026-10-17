@@ -5,7 +5,7 @@ description = "JWT Auth"
 requires-python = ">=3.14"
 readme = "README.md"
 dynamic = ["version"]
-dependencies = ["PyJWT~=2.10.1"]
+dependencies = ["PyJWT>=2.13,<3"]
 
 [build-system]
 requires = ["flit_core >=3.4,<4"]
