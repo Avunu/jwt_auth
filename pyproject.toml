@@ -1,11 +1,11 @@
 [project]
 name = "jwt_auth"
-authors = [{ name = "Avunu LLC", email = "kevin@avu.nu" }]
+authors = [{ name = "Avunu LLC", email = "mail@avu.nu" }]
 description = "JWT Auth"
 requires-python = ">=3.14"
 readme = "README.md"
 dynamic = ["version"]
-dependencies = ["PyJWT>=2.13,<3"]
+dependencies = ["PyJWT>=2.13,<3", "requests>=2.32,<3"]
 
 [build-system]
 requires = ["flit_core >=3.4,<4"]
@@ -57,7 +57,7 @@ show_missing = true
 skip_covered = true
 precision = 1
 exclude_also = ["if TYPE_CHECKING:", "raise NotImplementedError", "@(abc\\.)?abstractmethod"]
-fail_under = 0
+fail_under = 80
 
 [tool.vulture]
 exclude = [".venv/", "node_modules/", ".frappe-nix/", ".dev-dist/"]
