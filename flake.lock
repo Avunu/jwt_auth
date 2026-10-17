@@ -679,11 +679,11 @@
     "standards-profile": {
       "flake": false,
       "locked": {
-        "lastModified": 1792069950,
-        "narHash": "sha256-Hqo74Nvl+Bo48qNWup4u3GW3SS8YNp5i5ObpbhF1TLQ=",
+        "lastModified": 1792202064,
+        "narHash": "sha256-0OVHMSMm6UJFjfjLfKuzJqyXf8VnjoIzcP7vWUIC0S0=",
         "owner": "Avunu",
         "repo": "frappe-standards-profile",
-        "rev": "ca0e3a38f20dad82a0437ea6f820cf92920f1f62",
+        "rev": "9776af8d45ecbe09fed8b07008ee96afae0d0ae9",
         "type": "github"
       },
       "original": {
