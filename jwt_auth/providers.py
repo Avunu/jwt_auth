@@ -1,3 +1,6 @@
+# Copyright (c) 2026, Avunu LLC and contributors
+# For license information, please see license.txt
+
 import json
 from urllib.parse import quote
 
@@ -86,7 +89,7 @@ class CloudflareAccessProvider(BaseProvider):
 		# Example: https://<team_name>.cloudflareaccess.com/cdn-cgi/access/login/<aud_tag>
 		login_url = f"https://{self.team_name}.cloudflareaccess.com/cdn-cgi/access/login/{self.aud_tag}"
 
-		# If we have a frappe redirect-to parameter, we translate it into cloudflare’s `redirect_url`.
+		# If we have a frappe redirect-to parameter, we translate it into cloudflare's `redirect_url`.
 		# `redirect_to` is what frappe uses internally. We know cloudflare expects `redirect_url`.
 		if redirect_to:
 			path = "%2F" + quote(redirect_to, safe="")

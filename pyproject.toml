@@ -1,19 +1,18 @@
 [project]
 name = "jwt_auth"
-authors = [
-    { name = "Avunu LLC", email = "kevin@avu.nu"}
-]
+authors = [{ name = "Avunu LLC", email = "kevin@avu.nu" }]
 description = "JWT Auth"
-requires-python = ">=3.10"
+requires-python = ">=3.14"
 readme = "README.md"
 dynamic = ["version"]
-dependencies = [
-    "PyJWT~=2.10.1"
-]
+dependencies = ["PyJWT>=2.13,<3"]
 
 [build-system]
 requires = ["flit_core >=3.4,<4"]
 build-backend = "flit_core.buildapi"
+
+[tool.bench.frappe-dependencies]
+frappe = ">=16.0.0,<17.0.0"
 
 # These dependencies are only installed when developer mode is enabled
 [tool.bench.dev-dependencies]
@@ -21,35 +20,47 @@ build-backend = "flit_core.buildapi"
 
 [tool.ruff]
 line-length = 110
-target-version = "py310"
+target-version = "py314"
 
 [tool.ruff.lint]
-select = [
-    "F",
-    "E",
-    "W",
-    "I",
-    "UP",
-    "B",
-]
-ignore = [
-    "B017", # assertRaises(Exception) - should be more specific
-    "B018", # useless expression, not assigned to anything
-    "B023", # function doesn't bind loop variable - will have last iteration's value
-    "B904", # raise inside except without from
-    "E101", # indentation contains mixed spaces and tabs
-    "E402", # module level import not at top of file
-    "E501", # line too long
-    "E741", # ambiguous variable name
-    "F401", # "unused" imports
-    "F403", # can't detect undefined names from * import
-    "F405", # can't detect undefined names from * import
-    "F722", # syntax error in forward type annotation
-    "W191", # indentation contains tabs
-]
+select = ["F", "E", "W", "I", "UP", "B", "RUF", "SIM", "C4", "PIE", "PERF", "T20"]
+ignore = ["E501", "W191"]
 typing-modules = ["frappe.types.DF"]
 
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "tab"
 docstring-code-format = true
+
+[tool.frappe-nix]
+schema = 1
+profile = "github:Avunu/frappe-standards-profile/main"
+frappe-major = 16
+
+[tool.frappe-nix.dev-shell]
+frappe-nix-url = "github:Avunu/frappe-nix/e95f67f97de1322c89df9ffbc9218c31d4ca83ba"
+
+[tool.ty.environment]
+python-version = "3.14"
+
+[tool.ty.src]
+include = ["jwt_auth"]
+
+[tool.ty.terminal]
+error-on-warning = true
+
+[tool.coverage.run]
+omit = ["*/tests/*", "*/test_*.py", "*/patches/*"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+precision = 1
+exclude_also = ["if TYPE_CHECKING:", "raise NotImplementedError", "@(abc\\.)?abstractmethod"]
+fail_under = 0
+
+[tool.vulture]
+exclude = [".venv/", "node_modules/", ".frappe-nix/", ".dev-dist/"]
+
+[tool.test_utils.static-analysis]
+whitelist = ["frappe.*"]

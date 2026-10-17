@@ -1,3 +1,6 @@
+# Copyright (c) 2026, Avunu LLC and contributors
+# For license information, please see license.txt
+
 app_description = "JWT Auth"
 app_email = "kevin@avu.nu"
 app_include_js = ["app.bundle.js"]

@@ -1,3 +1,6 @@
+# Copyright (c) 2026, Avunu LLC and contributors
+# For license information, please see license.txt
+
 import json
 from typing import TYPE_CHECKING, Any, cast
 from urllib.parse import quote
@@ -15,17 +18,6 @@ if TYPE_CHECKING:
 from jwt_auth.jwt_auth.doctype.jwt_auth_settings.jwt_auth_settings import (
 	JWTAuthSettings,
 )
-
-
-class SessionJWTAuth:
-	def __init__(self, path: str | None = None, http_status_code: int | None = None) -> None:
-		if not hasattr(frappe.local, "jwt_auth"):
-			frappe.local.jwt_auth = JWTAuth(path, http_status_code)
-		elif path or http_status_code:
-			frappe.local.jwt_auth.update(path, http_status_code)
-
-	def __getattr__(self, name: str) -> Any:
-		return getattr(frappe.local.jwt_auth, name)
 
 
 class JWTAuth:
@@ -111,9 +103,7 @@ class JWTAuth:
 		self.token = self.get_token(frappe.local.request)
 		if not self.token:
 			return False
-		if self.is_valid_token(self.token):
-			return True
-		return False
+		return self.is_valid_token(self.token)
 
 	def update(self, path: str | None, http_status_code: int | None) -> None:
 		self.path = path
@@ -232,6 +222,17 @@ class JWTAuth:
 		frappe.db.commit()
 
 
+class SessionJWTAuth:
+	def __init__(self, path: str | None = None, http_status_code: int | None = None) -> None:
+		if not hasattr(frappe.local, "jwt_auth"):
+			frappe.local.jwt_auth = JWTAuth(path, http_status_code)
+		elif path or http_status_code:
+			frappe.local.jwt_auth.update(path, http_status_code)
+
+	def __getattr__(self, name: str) -> Any:
+		return getattr(frappe.local.jwt_auth, name)
+
+
 def handle_redirects(response: Response | None, request: Request) -> None:
 	if not response or not hasattr(frappe, "session") or not frappe.session:
 		return
@@ -289,11 +290,7 @@ def on_logout() -> None:
 def web_logout() -> None:
 	auth: SessionJWTAuth = SessionJWTAuth()
 	frappe.local.login_manager.logout()
-	location: str
-	if auth.settings.enabled:
-		location = auth.get_logout_url()
-	else:
-		location = "/login"
+	location: str = auth.get_logout_url() if auth.settings.enabled else "/login"
 	frappe.local.response["type"] = "redirect"
 	frappe.local.response["location"] = location
 

@@ -1,10 +1,10 @@
+// Copyright (c) 2026, Avunu LLC and contributors
+// For license information, please see license.txt
+
 document.addEventListener("DOMContentLoaded", () => {
 	// Wait for frappe to be initialized
 	const onFrappeApplication = () => {
 		if (window.frappe?.app) {
-			// Store reference to original logout function
-			const originalLogout = frappe.app.logout;
-
 			// Override the logout function
 			frappe.app.logout = function () {
 				var me = this;
