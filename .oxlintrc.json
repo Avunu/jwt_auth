@@ -52,19 +52,6 @@
 			"rules": {
 				"import/no-unassigned-import": "off"
 			}
-		},
-		{
-			"files": ["jwt_auth/jwt_auth/doctype/jwt_auth_settings/jwt_auth_settings.js"],
-			"globals": {
-				"frappe": "readonly",
-				"__": "readonly",
-				"cur_frm": "readonly",
-				"cur_list": "readonly",
-				"locals": "readonly",
-				"$": "readonly",
-				"jQuery": "readonly",
-				"moment": "readonly"
-			}
 		}
 	]
 }

@@ -1,3 +1,6 @@
+<!-- Copyright (c) 2026, Avunu LLC and contributors
+For license information, please see license.txt-->
+
 # JWT Auth for Frappe
 
 **JWT Auth** is a Frappe App that enables authentication via JWT tokens, integrating seamlessly with identity providers like Cloudflare Access. Instead of relying on native Frappe logins, this app authenticates incoming requests against a configured identity provider's JWT token, automatically logging in or registering users as needed.
@@ -6,14 +9,14 @@
 
 - **Provider-Based Architecture:**  
   Easily switch between different JWT providers (e.g., Cloudflare Access) by selecting a provider in the **JWT Auth Settings**.
-  
+
 - **Automatic Login and Registration:**  
   If the incoming JWT is valid and the user exists, they are immediately logged in. If the user does not exist but user registration is enabled, a new user will be created from existing `Contact` information or a placeholder user will be created, prompting profile updates.
-  
+
 - **Customizable Login and Logout URLs:**  
   Providers can define their own login and logout endpoints. This allows deep integration with various identity management and single sign-on (SSO) solutions.
-  
-- **Flexible Hooks:**  
+
+- **Flexible Hooks:**
   - `auth_hooks = ["jwt_auth.auth.validate_auth"]` ensures JWT validation occurs on every request.
   - `on_logout = ["jwt_auth.auth.on_logout"]` allows custom behavior on user logout.
   - A custom `page_renderer` is included to streamline the authentication and redirection flow.
@@ -23,10 +26,11 @@
 - Frappe Framework (v15+ recommended, though it may work on other versions).
 - An existing Identity Provider (IdP) that issues JWT tokens, such as Cloudflare Access.
 - `requests` Python library (typically included by default in Frappe environments).
-  
+
 ## Installation
 
 Navigate to your bench directory and install the app:
+
 ```bash
 bench get-app https://github.com/Avunu/jwt_auth.git
 bench --site your-site-name install-app jwt_auth
@@ -35,18 +39,18 @@ bench --site your-site-name install-app jwt_auth
 ## Configuration
 
 1. **JWT Auth Settings:**  
-   In Frappe, open **JWT Auth Settings** from the desk search.  
-   
+   In Frappe, open **JWT Auth Settings** from the desk search.
+
    - **Enabled:** Check this to enable JWT-based authentication.
    - **Enable Login:** Check to redirect unauthenticated users to the provider’s login.
    - **Enable User Reg:** Allow the creation of new users if they do not exist.
    - **Provider:** Select the provider (e.g., "Cloudflare Access").
-   
+
    For **Cloudflare Access**:
    - **team_name:** Your Cloudflare Access team name.
    - **aud_tag:** The AUD (audience) tag issued by Cloudflare.
    - **jwt_private_secret:** The expected JWT "audience" or secret used by the JWT library to validate the token’s audience.
-   
+
    After saving, your configuration will guide the JWTAuth provider logic.
 
 2. **Provider-Specific Fields:**  

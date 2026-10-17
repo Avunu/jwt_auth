@@ -1,3 +1,6 @@
+# Copyright (c) 2026, Avunu LLC and contributors
+# For license information, please see license.txt
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -5,7 +8,6 @@ from typing import TYPE_CHECKING
 import frappe
 from frappe.core.doctype.user.user import User
 from frappe.model.naming import append_number_if_name_exists
-from frappe.utils import cstr
 
 if TYPE_CHECKING:
 	from frappe.contacts.doctype.contact.contact import Contact

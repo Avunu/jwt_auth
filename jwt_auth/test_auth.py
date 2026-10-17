@@ -17,7 +17,7 @@ class TestJWTAuthUserRegistration(IntegrationTestCase):
 	"""Test cases for JWT Auth user registration functionality."""
 
 	@classmethod
-	def tearDownClass(cls) -> None:
+	def tearDownClass(cls) -> None:  # frappe-vulture:ignore
 		frappe.db.rollback()
 		super().tearDownClass()
 
@@ -209,7 +209,7 @@ class TestJWTAuthURLGeneration(IntegrationTestCase):
 	"""Test cases for JWT Auth URL generation."""
 
 	@classmethod
-	def tearDownClass(cls) -> None:
+	def tearDownClass(cls) -> None:  # frappe-vulture:ignore
 		frappe.db.rollback()
 		super().tearDownClass()
 
