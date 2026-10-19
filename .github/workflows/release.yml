@@ -22,7 +22,7 @@ jobs:
       checks: read
     uses: Avunu/frappe-nix/.github/workflows/app-release.yml@bb8969c873a8b13d342f45cbeb1272cc55ce6799 # v1.0.0
     with:
-      app: jwt_auth
+      app: jwt_bearer_auth
       integration-branch: develop
       release-branch: "version-16"
       publish: ${{ vars.MARKETPLACE_PUBLISH == 'true' }}

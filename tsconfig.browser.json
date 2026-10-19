@@ -6,6 +6,6 @@
 		"types": ["frappe-types/global"],
 		"allowImportingTsExtensions": true
 	},
-	"include": ["jwt_auth/public/js/**/*.ts", "jwt_auth/public/js/**/*.d.ts", "types/**/*.d.ts"],
-	"exclude": ["node_modules", "jwt_auth/public/dist"]
+	"include": ["jwt_bearer_auth/public/js/**/*.ts", "jwt_bearer_auth/public/js/**/*.d.ts", "types/**/*.d.ts"],
+	"exclude": ["node_modules", "jwt_bearer_auth/public/dist"]
 }
