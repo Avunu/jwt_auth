@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 
 class TestContactOnUpdate(IntegrationTestCase):
-	"""jwt_auth.jwt_auth.hooks.contact.on_update (doc_events: Contact on_update)."""
+	"""jwt_bearer_auth.jwt_auth.hooks.contact.on_update (doc_events: Contact on_update)."""
 
 	def tearDown(self) -> None:
 		frappe.db.rollback()
@@ -25,7 +25,7 @@ class TestContactOnUpdate(IntegrationTestCase):
 		self.assertIn("[Change Me]", str(contact.name))
 		last_name = f"Roe{random_string(6)}"
 
-		with patch("jwt_auth.jwt_auth.hooks.contact.frappe.enqueue") as enqueue:
+		with patch("jwt_bearer_auth.jwt_auth.hooks.contact.frappe.enqueue") as enqueue:
 			contact.first_name = "Jane"
 			contact.last_name = last_name
 			contact.save(ignore_permissions=True)
@@ -43,7 +43,7 @@ class TestContactOnUpdate(IntegrationTestCase):
 		contact = cast("Contact", frappe.get_doc({"doctype": "Contact", "first_name": "[Change Me]"}))
 		contact.insert(ignore_permissions=True)
 
-		with patch("jwt_auth.jwt_auth.hooks.contact.frappe.enqueue") as enqueue:
+		with patch("jwt_bearer_auth.jwt_auth.hooks.contact.frappe.enqueue") as enqueue:
 			contact.first_name = "Jane"
 			contact.last_name = last_name
 			contact.save(ignore_permissions=True)
@@ -57,7 +57,7 @@ class TestContactOnUpdate(IntegrationTestCase):
 		)
 		contact.insert(ignore_permissions=True)
 
-		with patch("jwt_auth.jwt_auth.hooks.contact.frappe.enqueue") as enqueue:
+		with patch("jwt_bearer_auth.jwt_auth.hooks.contact.frappe.enqueue") as enqueue:
 			contact.last_name = "Changed"
 			contact.save(ignore_permissions=True)
 

@@ -17,7 +17,7 @@ indent_style = space
 indent_size = 2
 
 # frappe's exporter: 1-space JSON, no final newline, for everything under the package
-[jwt_auth/**.json]
+[jwt_bearer_auth/**.json]
 indent_style = space
 indent_size = 1
 insert_final_newline = false

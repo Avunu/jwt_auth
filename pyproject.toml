@@ -1,7 +1,7 @@
 [project]
-name = "jwt_auth"
+name = "jwt_bearer_auth"
 authors = [{ name = "Avunu LLC", email = "mail@avu.nu" }]
-description = "JWT Auth"
+description = "JWT Bearer Authentication"
 requires-python = ">=3.14"
 readme = "README.md"
 dynamic = ["version"]
@@ -41,7 +41,7 @@ frappe-major = 16
 python-version = "3.14"
 
 [tool.ty.src]
-include = ["jwt_auth"]
+include = ["jwt_bearer_auth"]
 
 [tool.ty.terminal]
 error-on-warning = true
@@ -60,4 +60,5 @@ fail_under = 80
 exclude = [".venv/", "node_modules/", ".frappe-nix/", ".dev-dist/", ".devenv/", ".direnv/"]
 
 [tool.test_utils.static-analysis]
-whitelist = ["frappe.*"]
+# jwt_auth.*: the old dotted paths kept in hooks.py's override_whitelisted_methods rename shim
+whitelist = ["frappe.*", "jwt_auth.*"]

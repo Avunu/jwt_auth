@@ -1,9 +1,9 @@
 <!-- Copyright (c) 2026, Avunu LLC and contributors
 For license information, please see license.txt-->
 
-# JWT Auth for Frappe
+# JWT Bearer Authentication for Frappe
 
-**JWT Auth** is a Frappe App that enables authentication via JWT tokens, integrating seamlessly with identity providers like Cloudflare Access. Instead of relying on native Frappe logins, this app authenticates incoming requests against a configured identity provider's JWT token, automatically logging in or registering users as needed.
+**JWT Bearer Authentication** is a Frappe App that enables authentication via JWT tokens, integrating seamlessly with identity providers like Cloudflare Access. Instead of relying on native Frappe logins, this app authenticates incoming requests against a configured identity provider's JWT token, automatically logging in or registering users as needed.
 
 ## Features
 
@@ -17,10 +17,10 @@ For license information, please see license.txt-->
   The login and logout URLs and the redirect parameter are settings, so the app works with any single sign-on (SSO) front door that issues JWTs.
 
 - **Hooks:**
-  - `auth_hooks = ["jwt_auth.auth.validate_auth"]` validates the JWT on every request.
-  - `on_logout = ["jwt_auth.auth.on_logout"]` sends the user to the provider's logout URL.
-  - `after_request = ["jwt_auth.auth.handle_redirects"]` applies the login, logout and post-registration redirects.
-  - The desk's **Log out** goes through `jwt_auth.auth.jwt_logout`, so the provider's session ends too.
+  - `auth_hooks = ["jwt_bearer_auth.auth.validate_auth"]` validates the JWT on every request.
+  - `on_logout = ["jwt_bearer_auth.auth.on_logout"]` sends the user to the provider's logout URL.
+  - `after_request = ["jwt_bearer_auth.auth.handle_redirects"]` applies the login, logout and post-registration redirects.
+  - The desk's **Log out** goes through `jwt_bearer_auth.auth.jwt_logout`, so the provider's session ends too.
 
 ## Prerequisites
 
@@ -32,8 +32,8 @@ For license information, please see license.txt-->
 Navigate to your bench directory and install the app:
 
 ```bash
-bench get-app https://github.com/Avunu/jwt_auth.git
-bench --site your-site-name install-app jwt_auth
+bench get-app https://github.com/Avunu/jwt_bearer_auth.git
+bench --site your-site-name install-app jwt_bearer_auth
 ```
 
 ## Configuration
@@ -54,7 +54,7 @@ bench --site your-site-name install-app jwt_auth
   If `Enable Login` is checked and a user hits a page while unauthenticated, they will be redirected to the provider’s login URL.
 
 - **Logout:**  
-  Logging out from the Frappe interface or calling `/?cmd=jwt_auth.auth.web_logout` will revoke the session and redirect the user to the provider’s logout URL.
+  Logging out from the Frappe interface or calling `/?cmd=jwt_bearer_auth.auth.web_logout` will revoke the session and redirect the user to the provider’s logout URL.
 
 - **Automatic Redirection:**  
   Unauthenticated users are redirected to the login URL. If registration is enabled and the user does not exist, a new user is created and optionally redirected to a profile update page.

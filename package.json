@@ -1,8 +1,8 @@
 {
-	"name": "jwt-auth",
+	"name": "jwt-bearer-auth",
 	"version": "0.0.1",
 	"private": true,
-	"description": "JWT Auth",
+	"description": "JWT Bearer Authentication",
 	"license": "MIT",
 	"author": "Avunu LLC",
 	"type": "module",

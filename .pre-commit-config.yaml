@@ -135,7 +135,7 @@ repos:
         args: ["."]
       - id: validate_doctype_python_types
       - id: validate_copyright
-        args: [--app, jwt_auth]
+        args: [--app, jwt_bearer_auth]
         # Never stamp a managed file (its header is line 1, or it is the profile's), or a generated one (its
         # freshness diff would fail), nor a script: a stamp above `#!/usr/bin/env node` breaks it (scripts/ and
         # ci/ hold the node tools).
