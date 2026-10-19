@@ -15,7 +15,7 @@ from werkzeug import Request, Response
 if TYPE_CHECKING:
 	from frappe.contacts.doctype.contact.contact import Contact
 
-from jwt_auth.jwt_auth.doctype.jwt_auth_settings.jwt_auth_settings import (
+from jwt_bearer_auth.jwt_auth.doctype.jwt_auth_settings.jwt_auth_settings import (
 	JWTAuthSettings,
 )
 

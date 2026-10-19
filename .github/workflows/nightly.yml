@@ -19,7 +19,7 @@ jobs:
       issues: write
     uses: Avunu/frappe-nix/.github/workflows/app-nightly.yml@bb8969c873a8b13d342f45cbeb1272cc55ce6799 # v1.0.0
     with:
-      app: jwt_auth
+      app: jwt_bearer_auth
       integration-branch: develop
       nix-cache: ${{ vars.FRAPPE_NIX_CACHE || '' }}
       run-integration: true

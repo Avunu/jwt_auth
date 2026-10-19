@@ -474,7 +474,7 @@ wheels = [
 ]
 
 [[package]]
-name = "jwt-auth-tools"
+name = "jwt-bearer-auth-tools"
 version = "0"
 source = { virtual = "." }
 dependencies = [

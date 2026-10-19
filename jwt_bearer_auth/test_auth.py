@@ -20,7 +20,7 @@ if TYPE_CHECKING:
 	from frappe.core.doctype.user.user import User
 	from frappe.utils.redis_wrapper import RedisWrapper
 
-	from jwt_auth.jwt_auth.doctype.jwt_auth_settings.jwt_auth_settings import JWTAuthSettings
+	from jwt_bearer_auth.jwt_auth.doctype.jwt_auth_settings.jwt_auth_settings import JWTAuthSettings
 
 
 class TestJWTAuthUserRegistration(IntegrationTestCase):
@@ -33,7 +33,7 @@ class TestJWTAuthUserRegistration(IntegrationTestCase):
 
 	def _get_jwt_auth_instance(self) -> Any:
 		"""Get a JWTAuth instance for testing."""
-		from jwt_auth.auth import JWTAuth
+		from jwt_bearer_auth.auth import JWTAuth
 
 		return JWTAuth()
 
@@ -181,7 +181,7 @@ class TestJWTAuthUserRegistration(IntegrationTestCase):
 
 	def test_auth_handles_existing_user_without_contact(self) -> None:
 		"""Test that auth() handles existing user without associated contact."""
-		from jwt_auth.auth import JWTAuth
+		from jwt_bearer_auth.auth import JWTAuth
 
 		test_email = f"test{random_string(8).lower()}@example.com"
 
@@ -226,7 +226,7 @@ class TestJWTAuthURLGeneration(IntegrationTestCase):
 
 	def _get_jwt_auth_instance(self) -> Any:
 		"""Get a JWTAuth instance for testing."""
-		from jwt_auth.auth import JWTAuth
+		from jwt_bearer_auth.auth import JWTAuth
 
 		auth = JWTAuth()
 		auth.path = "/test-page"
@@ -348,7 +348,7 @@ class JWTAuthTestCase(IntegrationTestCase):
 
 	def setUp(self) -> None:
 		super().setUp()
-		from jwt_auth.auth import JWTAuth
+		from jwt_bearer_auth.auth import JWTAuth
 
 		self.key = _new_key()
 		self.auth = JWTAuth()
@@ -359,7 +359,7 @@ class JWTAuthTestCase(IntegrationTestCase):
 		frappe.local.login_manager = self.login_manager
 		frappe.local.jwt_auth = self.auth
 		frappe.local.request = _request()
-		self.jwks = patch("jwt_auth.auth.requests.get", return_value=_jwks_response(_jwks(self.key)))
+		self.jwks = patch("jwt_bearer_auth.auth.requests.get", return_value=_jwks_response(_jwks(self.key)))
 		self.requests_get = self.jwks.start()
 
 	def tearDown(self) -> None:
@@ -474,7 +474,7 @@ class TestAuthHook(JWTAuthTestCase):
 	"""The auth_hooks entry point and the login or registration it leads to."""
 
 	def test_validate_auth_logs_in_an_existing_user(self) -> None:
-		from jwt_auth.auth import validate_auth
+		from jwt_bearer_auth.auth import validate_auth
 
 		email = f"jwt{random_string(8).lower()}@example.com"
 		frappe.get_doc(
@@ -488,7 +488,7 @@ class TestAuthHook(JWTAuthTestCase):
 		self.login_manager.login_as.assert_called_once_with(email)
 
 	def test_validate_auth_ignores_an_invalid_token(self) -> None:
-		from jwt_auth.auth import validate_auth
+		from jwt_bearer_auth.auth import validate_auth
 
 		self.as_guest()
 		frappe.local.request = _request(token=_token(_new_key()))
@@ -568,7 +568,7 @@ class TestLogout(JWTAuthTestCase):
 	"""The whitelisted logout endpoints and the on_logout hook."""
 
 	def test_jwt_logout_returns_the_provider_logout_url(self) -> None:
-		from jwt_auth.auth import jwt_logout
+		from jwt_bearer_auth.auth import jwt_logout
 
 		result = jwt_logout()
 
@@ -576,13 +576,13 @@ class TestLogout(JWTAuthTestCase):
 		self.assertTrue(result["redirect_url"].startswith(LOGOUT_URL))
 
 	def test_jwt_logout_when_disabled_returns_login(self) -> None:
-		from jwt_auth.auth import jwt_logout
+		from jwt_bearer_auth.auth import jwt_logout
 
 		self.auth.settings.enabled = 0
 		self.assertEqual(jwt_logout(), {"redirect_url": "/login"})
 
 	def test_web_logout_redirects_to_the_provider(self) -> None:
-		from jwt_auth.auth import web_logout
+		from jwt_bearer_auth.auth import web_logout
 
 		web_logout()
 
@@ -591,14 +591,14 @@ class TestLogout(JWTAuthTestCase):
 		self.assertTrue(frappe.local.response["location"].startswith(LOGOUT_URL))
 
 	def test_web_logout_when_disabled_redirects_to_login(self) -> None:
-		from jwt_auth.auth import web_logout
+		from jwt_bearer_auth.auth import web_logout
 
 		self.auth.settings.enabled = 0
 		web_logout()
 		self.assertEqual(frappe.local.response["location"], "/login")
 
 	def test_on_logout_flags_the_provider_logout(self) -> None:
-		from jwt_auth.auth import on_logout
+		from jwt_bearer_auth.auth import on_logout
 
 		on_logout()
 
@@ -615,12 +615,12 @@ class TestHandleRedirects(JWTAuthTestCase):
 		return response
 
 	def test_no_response(self) -> None:
-		from jwt_auth.auth import handle_redirects
+		from jwt_bearer_auth.auth import handle_redirects
 
 		handle_redirects(None, _request())
 
 	def test_logout_redirect_for_guest(self) -> None:
-		from jwt_auth.auth import handle_redirects
+		from jwt_bearer_auth.auth import handle_redirects
 
 		self.as_guest()
 		frappe.flags["jwt_logout_redirect"] = LOGOUT_URL
@@ -633,7 +633,7 @@ class TestHandleRedirects(JWTAuthTestCase):
 		self.assertNotIn("jwt_logout_redirect", frappe.flags)
 
 	def test_post_registration_redirect(self) -> None:
-		from jwt_auth.auth import handle_redirects
+		from jwt_bearer_auth.auth import handle_redirects
 
 		frappe.local.session = frappe._dict(
 			user="new@example.com", data=frappe._dict(jwt_auth_redirect="/update-profile/x/edit")
@@ -647,7 +647,7 @@ class TestHandleRedirects(JWTAuthTestCase):
 		self.assertNotIn("jwt_auth_redirect", frappe.session.data)
 
 	def test_me_returns_to_the_original_location(self) -> None:
-		from jwt_auth.auth import handle_redirects
+		from jwt_bearer_auth.auth import handle_redirects
 
 		user = f"back{random_string(8).lower()}@example.com"
 		frappe.local.session = frappe._dict(user=user, data=frappe._dict())
@@ -660,7 +660,7 @@ class TestHandleRedirects(JWTAuthTestCase):
 		self.assertIsNone(_cache().get_value(f"jwt_original_location_{user}"))
 
 	def test_plain_request_is_untouched(self) -> None:
-		from jwt_auth.auth import handle_redirects
+		from jwt_bearer_auth.auth import handle_redirects
 
 		frappe.local.session = frappe._dict(user="Administrator", data=frappe._dict())
 		response = self._response()
@@ -671,7 +671,7 @@ class TestHandleRedirects(JWTAuthTestCase):
 		self.assertNotIn("Location", response.headers)
 
 	def test_session_without_data(self) -> None:
-		from jwt_auth.auth import handle_redirects
+		from jwt_bearer_auth.auth import handle_redirects
 
 		frappe.local.session = frappe._dict(user="Administrator", data=None)
 		response = self._response()

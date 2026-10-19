@@ -6,12 +6,12 @@
 	"packages": {
 		".": {
 			"release-type": "node",
-			"package-name": "jwt-auth",
+			"package-name": "jwt-bearer-auth",
 			"changelog-path": "CHANGELOG.md",
 			"extra-files": [
 				{
 					"type": "generic",
-					"path": "jwt_auth/__init__.py"
+					"path": "jwt_bearer_auth/__init__.py"
 				}
 			]
 		}

@@ -5,8 +5,8 @@ requires-python = "==3.14.*"
 [manifest]
 members = [
     "frappe",
-    "jwt-auth",
-    "jwt-auth-bench",
+    "jwt-bearer-auth",
+    "jwt-bearer-auth-bench",
 ]
 overrides = [
     { name = "click", specifier = "~=8.3.1" },
@@ -1163,8 +1163,8 @@ wheels = [
 ]
 
 [[package]]
-name = "jwt-auth"
-source = { editable = "apps/jwt_auth" }
+name = "jwt-bearer-auth"
+source = { editable = "apps/jwt_bearer_auth" }
 dependencies = [
     { name = "pyjwt" },
     { name = "requests" },
@@ -1177,7 +1177,7 @@ requires-dist = [
 ]
 
 [[package]]
-name = "jwt-auth-bench"
+name = "jwt-bearer-auth-bench"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [

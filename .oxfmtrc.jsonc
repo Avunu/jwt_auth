@@ -7,7 +7,7 @@
 	"printWidth": 110,
 	"ignorePatterns": [
 		// frappe's exporter writes every JSON under the package and rewrites it on export
-		"jwt_auth/**/*.json",
+		"jwt_bearer_auth/**/*.json",
 		"nix/**",
 		"docs-site/**",
 		"docs/screenshots/**",

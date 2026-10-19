@@ -28,7 +28,7 @@
 		"unicorn/no-array-sort": "off"
 	},
 	"ignorePatterns": [
-		"jwt_auth/public/dist/**",
+		"jwt_bearer_auth/public/dist/**",
 		".frappe-nix/**",
 		".dev-dist/**",
 		"nix/**",
@@ -48,7 +48,7 @@
 			}
 		},
 		{
-			"files": ["jwt_auth/public/js/*.bundle.ts", "jwt_auth/public/js/*.bundle.js"],
+			"files": ["jwt_bearer_auth/public/js/*.bundle.ts", "jwt_bearer_auth/public/js/*.bundle.js"],
 			"rules": {
 				"import/no-unassigned-import": "off"
 			}
