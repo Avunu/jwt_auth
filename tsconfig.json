@@ -4,6 +4,9 @@
 	"references": [
 		{
 			"path": "./tsconfig.browser.json"
+		},
+		{
+			"path": "./tsconfig.scripts.json"
 		}
 	]
 }

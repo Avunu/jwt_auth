@@ -1,0 +1,42 @@
+[
+	{
+		"name": "registered-users",
+		"theme": "dark",
+		"alt": "The user list with two website users created from a token: one filled in from a Contact, one still to complete their profile",
+		"featured": false,
+		"readme": "feature",
+		"width": 2880,
+		"height": 1800,
+		"sha256": "6585df0633e22f1b1c728c5bc463cc61799d6018ef6523dfa011b36176874a0f"
+	},
+	{
+		"name": "registered-users",
+		"theme": "light",
+		"alt": "The user list with two website users created from a token: one filled in from a Contact, one still to complete their profile",
+		"featured": false,
+		"readme": "feature",
+		"width": 2880,
+		"height": 1800,
+		"sha256": "627845acf46621a0bdb92a5afcf0ede505ebacb5b0263ed92e003bf5a97377af"
+	},
+	{
+		"name": "settings",
+		"theme": "dark",
+		"alt": "JWT Auth Settings filled in for Cloudflare Access: token cookie, JWKS URL, audience, and login and logout URLs",
+		"featured": true,
+		"readme": "hero",
+		"width": 2880,
+		"height": 1800,
+		"sha256": "0a5a889b84823d804815c7a799623d18442982071a7a4cda46ed73d2bcd4e647"
+	},
+	{
+		"name": "settings",
+		"theme": "light",
+		"alt": "JWT Auth Settings filled in for Cloudflare Access: token cookie, JWKS URL, audience, and login and logout URLs",
+		"featured": true,
+		"readme": "hero",
+		"width": 2880,
+		"height": 1800,
+		"sha256": "6a560850067785ab3b26533ba2d6da46bff722c3cba8b8c3d7e23043743a51df"
+	}
+]

@@ -1,10 +1,10 @@
 # Copyright (c) 2026, Avunu LLC and contributors
 # For license information, please see license.txt
 
-app_description = "JWT Bearer Authentication"
+app_description = "JWT single sign-on for Frappe via Cloudflare Access or another JWKS provider"
 app_email = "mail@avu.nu"
 app_include_js = ["app.bundle.js"]
-app_license = "mit"
+app_license = "MIT"
 app_name = "jwt_bearer_auth"
 app_publisher = "Avunu LLC"
 app_title = "JWT Bearer Authentication"
