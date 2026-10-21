@@ -1,0 +1,10 @@
+# The app's registry listing (docs/app-standards/marketplace.md); frappe-listing check validates it.
+schema = 1
+title = "JWT Bearer Authentication"
+tagline = "JWT single sign-on for Frappe via Cloudflare Access or another JWKS provider"
+type = "integration"
+category = "Integrations"
+categories = ["Authentication", "Security"]
+website = "https://avunu.net/open-source/jwt_bearer_auth/"
+documentation = "https://docs.avunu.net/jwt-bearer-auth/"
+apps_screen = false
