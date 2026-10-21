@@ -36,11 +36,14 @@ def setup(_ctx: dict[str, Any]) -> None:
 	settings.save(ignore_permissions=True)
 
 	if not frappe.db.exists("Contact Email", {"email_id": CONTACT["email"]}):
-		contact = frappe.new_doc("Contact")
-		contact.first_name = CONTACT["first_name"]
-		contact.last_name = CONTACT["last_name"]
-		contact.append("email_ids", {"email_id": CONTACT["email"], "is_primary": 1})
-		contact.insert(ignore_permissions=True)
+		frappe.get_doc(
+			{
+				"doctype": "Contact",
+				"first_name": CONTACT["first_name"],
+				"last_name": CONTACT["last_name"],
+				"email_ids": [{"email_id": CONTACT["email"], "is_primary": 1}],
+			}
+		).insert(ignore_permissions=True)
 
 	# The app's own registration path, as a valid token for these emails would run it.
 	auth = JWTAuth()
