@@ -15,7 +15,7 @@ jobs:
     permissions:
       contents: read
       pull-requests: read
-    uses: Avunu/frappe-nix/.github/workflows/app-pr-policy.yml@32387277142e7e0f43254cba6b67b171dcd00d7e # v1.1.0
+    uses: Avunu/frappe-nix/.github/workflows/app-pr-policy.yml@512da46b94979ea91fa0457704a204c8f3704b3e # v1.1.1
     with:
       app: jwt_bearer_auth
       integration-branch: develop
