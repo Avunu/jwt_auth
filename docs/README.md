@@ -29,7 +29,7 @@
 Navigate to your bench directory and install the app:
 
 ```bash
-bench get-app https://github.com/Avunu/jwt_bearer_auth.git
+bench get-app https://github.com/Avunu/jwt_bearer_auth --branch version-16
 bench --site your-site-name install-app jwt_bearer_auth
 ```
 
@@ -48,7 +48,7 @@ bench --site your-site-name install-app jwt_bearer_auth
 ## Usage
 
 - **Login:**  
-  If `Enable Login` is checked and a user hits a page while unauthenticated, they will be redirected to the provider’s login URL.
+  If **Override Frappe Login** is checked and a user hits a page while unauthenticated, they will be redirected to the provider’s login URL.
 
 - **Logout:**  
   Logging out from the Frappe interface or calling `/?cmd=jwt_bearer_auth.auth.web_logout` will revoke the session and redirect the user to the provider’s logout URL.
@@ -62,11 +62,11 @@ bench --site your-site-name install-app jwt_bearer_auth
   Check that **JWT Private Secret** (the audience) is set and correct, and that the **JWKS URL** is reachable from the server.
 
 - **Users Not Created:**  
-  Make sure `Enable User Reg` is checked and that the user’s email is present in the JWT claims. If user registration logic relies on the `Contact` doctype, ensure `Contact` records exist, or fallback logic creates a placeholder user.
+  Make sure **Enable New User Registration** is checked and that the user’s email is present in the JWT claims. If user registration logic relies on the `Contact` doctype, ensure `Contact` records exist, or fallback logic creates a placeholder user.
 
 - **Redirect Loops:**  
   If you experience redirect loops, verify that you are receiving a valid token from your IdP. Confirm that the token arrives in the header or cookie named in **JWT Cookie/Header**.
 
 ## License
 
-MIT License. See [license.txt](./license.txt) for more details.
+MIT License. See [license.txt](https://github.com/Avunu/jwt_bearer_auth/blob/develop/license.txt) for more details.
