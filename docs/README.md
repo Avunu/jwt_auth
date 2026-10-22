@@ -11,7 +11,7 @@
   If the incoming JWT is valid and the user exists, they are immediately logged in. If the user does not exist but user registration is enabled, a new user will be created from existing `Contact` information or a placeholder user will be created, prompting profile updates.
 
 - **Customizable Login and Logout URLs:**  
-  The logout URL and the redirect parameter are settings, so the app works with any single sign-on (SSO) front door that issues JWTs. The login URL is a setting too, but it is used only by **Override Frappe Login**, which currently has no effect.
+  The login URL, the logout URL and the redirect parameter are settings, so the app works with any single sign-on (SSO) front door that issues JWTs.
 
 - **Hooks:**
   - `auth_hooks = ["jwt_bearer_auth.auth.validate_auth"]` validates the JWT on every request.
@@ -39,18 +39,18 @@ bench --site your-site-name install-app jwt_bearer_auth
 
 - **Enable JWT User Auth:** turn JWT-based authentication on.
 - **Enable New User Registration:** create a user when a valid token names an email with no user yet.
-- **Override Frappe Login:** meant to redirect requests for Frappe's `/login` page to the **Login URL**. It currently has no effect; see [Limitations](../README.md#limitations).
+- **Override Frappe Login:** send guests who open Frappe's `/login` page to the **Login URL**, carrying the page they asked for.
 - **JWT Cookie/Header:** the cookie or header that carries the token (for Cloudflare Access, `CF_Authorization` or `Cf-Access-Jwt-Assertion`).
 - **JWKS URL:** the provider's public keys (for Cloudflare Access, `https://<team>.cloudflareaccess.com/cdn-cgi/access/certs`).
 - **JWT Private Secret:** the audience the token must be issued for (for Cloudflare Access, the application's AUD tag). Without it, every token is rejected.
 - **Logout URL:** where users are sent after logging out.
-- **Login URL:** used only by **Override Frappe Login**, so it currently has no effect.
-- **Redirect Param:** the query parameter that carries the page to return to, added to the logout URL (and to the login URL once the override works).
+- **Login URL:** the provider's login page, used by **Override Frappe Login**.
+- **Redirect Param:** the query parameter that carries the page to return to, added to the login and logout URLs.
 
 ## Usage
 
 - **Login:**  
-  Users who reach the site with a valid token from the identity provider are logged in automatically. **Override Frappe Login** is meant to redirect requests for Frappe's `/login` page to the **Login URL**, but it currently has no effect (see [Limitations](../README.md#limitations)); visitors who reach `/login` see Frappe's login page.
+  Users who reach the site with a valid token from the identity provider are logged in automatically. With **Override Frappe Login** on, guests who reach Frappe's `/login` page are redirected to the **Login URL**, with the page they asked for in **Redirect Param**; with it off, they see Frappe's login page.
 
 - **Logout:**  
   Logging out from the Frappe interface or calling `/?cmd=jwt_bearer_auth.auth.web_logout` will revoke the session and redirect the user to the provider’s logout URL.

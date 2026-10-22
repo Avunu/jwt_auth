@@ -74,17 +74,17 @@ bench --site <site> install-app jwt_bearer_auth
 
 Open **JWT Auth Settings** from the desk search. You need an identity provider that issues JWTs; for Cloudflare Access, put the site behind an Access application first.
 
-| Setting                          | What it does                                                                                                                                                                     |
-| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Enable JWT User Auth**         | Turns token login on.                                                                                                                                                            |
-| **Enable New User Registration** | Creates a user when a valid token names an email with no user yet.                                                                                                               |
-| **Override Frappe Login**        | Meant to send visitors on Frappe's login page to the provider's **Login URL**; see [Limitations](#limitations).                                                                  |
-| **JWT Cookie/Header**            | The cookie or header that carries the token. The cookie is checked first. For Cloudflare Access, `CF_Authorization` (cookie) or `Cf-Access-Jwt-Assertion` (header).              |
-| **JWKS URL**                     | The provider's public keys. For Cloudflare Access, `https://<team>.cloudflareaccess.com/cdn-cgi/access/certs`.                                                                   |
-| **JWT Private Secret**           | The audience the token must be issued for. For Cloudflare Access, the application's AUD tag. It is stored as a password field. Without it, every token is rejected.              |
-| **Logout URL**                   | Where users are sent after logging out.                                                                                                                                          |
-| **Login URL**                    | Used only by **Override Frappe Login**, so it currently has no effect; see [Limitations](#limitations).                                                                          |
-| **Redirect Param**               | The query parameter that carries the page to return to, added to the logout URL (and to the login URL once the override works). Leave it empty if the provider doesn't take one. |
+| Setting                          | What it does                                                                                                                                                        |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Enable JWT User Auth**         | Turns token login on.                                                                                                                                               |
+| **Enable New User Registration** | Creates a user when a valid token names an email with no user yet.                                                                                                  |
+| **Override Frappe Login**        | Sends guests who open Frappe's `/login` page to the provider's **Login URL**, carrying the page they asked for in **Redirect Param**.                               |
+| **JWT Cookie/Header**            | The cookie or header that carries the token. The cookie is checked first. For Cloudflare Access, `CF_Authorization` (cookie) or `Cf-Access-Jwt-Assertion` (header). |
+| **JWKS URL**                     | The provider's public keys. For Cloudflare Access, `https://<team>.cloudflareaccess.com/cdn-cgi/access/certs`.                                                      |
+| **JWT Private Secret**           | The audience the token must be issued for. For Cloudflare Access, the application's AUD tag. It is stored as a password field. Without it, every token is rejected. |
+| **Logout URL**                   | Where users are sent after logging out.                                                                                                                             |
+| **Login URL**                    | The provider's login page, used by **Override Frappe Login**.                                                                                                       |
+| **Redirect Param**               | The query parameter that carries the page to return to, added to the login and logout URLs. Leave it empty if the provider doesn't take one.                        |
 
 Troubleshooting notes are in the [documentation](docs/README.md#troubleshooting).
 
@@ -102,7 +102,6 @@ Troubleshooting notes are in the [documentation](docs/README.md#troubleshooting)
 - The JWKS is fetched again for every token it checks, with no cache, so each login from a token makes one request to the provider.
 - Users created by registration are Website Users. Give them roles and desk access by hand if they need it.
 - The app does not check that a request came through the identity provider: any client holding a valid token for the audience can send it in the cookie or header. Keep the site reachable only through the provider.
-- **Override Frappe Login** has no effect at present: the redirect compares the request path with `login`, but Frappe's request paths start with `/`, so the check never matches. Visitors who reach `/login` see Frappe's login page.
 - One identity provider per site: the settings hold a single JWKS URL, audience, and cookie or header name.
 
 <!-- frappe-nix:begin support -->
