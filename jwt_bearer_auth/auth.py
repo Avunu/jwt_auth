@@ -117,7 +117,8 @@ class JWTAuth:
 		login_url: str = self.settings.login_url
 		if self.settings.redirect_param:
 			redirect: str = redirect_to if redirect_to else self.path or ""
-			path: str = "%2F" + quote(string=redirect, safe="")
+			# Frappe's redirect-to already starts with "/"; strip it so the target isn't "//...".
+			path: str = "%2F" + quote(string=redirect.lstrip("/"), safe="")
 			if "?" in login_url:
 				login_url += f"&{self.settings.redirect_param}={path}"
 			else:
@@ -261,7 +262,9 @@ def handle_redirects(response: Response | None, request: Request) -> None:
 
 	redirect_to: str | None = frappe.session.data.pop("jwt_auth_redirect", False)
 
-	if getattr(request, "path", None) == "login":
+	# Werkzeug request paths start with "/". Only guests are sent away: a logged-in user on /login
+	# is already handled by Frappe's own login page.
+	if getattr(request, "path", None) == "/login" and frappe.session.get("user") == "Guest":
 		auth = SessionJWTAuth()
 		if auth.settings.enabled and auth.settings.enable_login:
 			redirect_param = "redirect-to"

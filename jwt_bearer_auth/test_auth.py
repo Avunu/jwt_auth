@@ -545,6 +545,10 @@ class TestURLs(JWTAuthTestCase):
 	def test_login_url_carries_the_redirect(self) -> None:
 		self.assertEqual(self.auth.get_login_url("app/todo"), f"{LOGIN_URL}?redirect_url=%2Fapp%2Ftodo")
 
+	def test_login_url_takes_a_redirect_with_a_leading_slash(self) -> None:
+		# Frappe's redirect-to starts with "/"; the target must not become "//app/todo".
+		self.assertEqual(self.auth.get_login_url("/app/todo"), f"{LOGIN_URL}?redirect_url=%2Fapp%2Ftodo")
+
 	def test_login_url_falls_back_to_the_current_path(self) -> None:
 		self.auth.update("orders", None)
 		self.assertEqual(self.auth.get_login_url(), f"{LOGIN_URL}?redirect_url=%2Forders")
@@ -679,3 +683,54 @@ class TestHandleRedirects(JWTAuthTestCase):
 		handle_redirects(response, _request())
 
 		self.assertEqual(response.status_code, 200)
+
+	def _login_request(self, redirect_to: str | None = None) -> MagicMock:
+		request = _request(path="/login")
+		request.args = {"redirect-to": redirect_to} if redirect_to else {}
+		return request
+
+	def test_login_override_sends_a_guest_to_the_provider(self) -> None:
+		from jwt_bearer_auth.auth import handle_redirects
+
+		self.auth.settings.enable_login = 1
+		self.as_guest()
+		response = self._response()
+
+		handle_redirects(response, self._login_request("/app/todo"))
+
+		self.assertEqual(response.status_code, 302)
+		self.assertEqual(response.headers["Location"], f"{LOGIN_URL}?redirect_url=%2Fapp%2Ftodo")
+
+	def test_login_override_without_redirect_to(self) -> None:
+		from jwt_bearer_auth.auth import handle_redirects
+
+		self.auth.settings.enable_login = 1
+		self.as_guest()
+		response = self._response()
+
+		handle_redirects(response, self._login_request())
+
+		self.assertEqual(response.headers["Location"], f"{LOGIN_URL}?redirect_url=%2F")
+
+	def test_login_page_is_left_alone_when_the_override_is_off(self) -> None:
+		from jwt_bearer_auth.auth import handle_redirects
+
+		self.as_guest()
+		response = self._response()
+
+		handle_redirects(response, self._login_request("/app"))
+
+		self.assertEqual(response.status_code, 200)
+		self.assertNotIn("Location", response.headers)
+
+	def test_login_override_leaves_a_logged_in_user_alone(self) -> None:
+		from jwt_bearer_auth.auth import handle_redirects
+
+		self.auth.settings.enable_login = 1
+		frappe.local.session = frappe._dict(user="Administrator", data=frappe._dict())
+		response = self._response()
+
+		handle_redirects(response, self._login_request("/app"))
+
+		self.assertEqual(response.status_code, 200)
+		self.assertNotIn("Location", response.headers)
