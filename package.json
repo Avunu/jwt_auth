@@ -1,6 +1,6 @@
 {
 	"name": "jwt-bearer-auth",
-	"version": "0.0.1",
+	"version": "16.0.0",
 	"private": true,
 	"description": "JWT Bearer Authentication",
 	"license": "MIT",
